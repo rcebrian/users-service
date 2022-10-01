@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  description: Basic api with common functions
+  version: 1.0.0
+  title: Basic API
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: system
+    description: System health operations
+paths:
+  /health:
+    get:
+      tags:
+        - system
+      summary: Healthcheck
+      description: Get server health
+      operationId: getHealth
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  time:
+                    type: string
+      x-internal: true
+servers:
+  - url: 'http://localhost:8080'
+    description: localhost
