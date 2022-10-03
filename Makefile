@@ -1,5 +1,5 @@
 api_gen:
-	sh scripts/openapi.sh
+	bash scripts/openapi.sh
 
 api_clean:
 	rm -r internal/platform/server/api \

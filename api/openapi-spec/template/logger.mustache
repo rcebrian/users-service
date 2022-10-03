@@ -1,0 +1,24 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+	"api-template/pkg/logger"
+	"net/http"
+	"time"
+)
+
+func Logger(inner http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		inner.ServeHTTP(w, r)
+		logger.Infof("%s - :remote-user \"%s %s %s\" :status %d \":referrer\" \"%s\" - %s",
+        			r.Host,
+        			r.Method,
+        			r.RequestURI,
+        			r.Proto,
+        			r.ContentLength,
+        			r.Header.Get("User-Agent"),
+        			time.Since(start),
+        		)
+	})
+}
