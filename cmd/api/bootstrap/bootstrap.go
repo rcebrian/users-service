@@ -2,13 +2,24 @@ package bootstrap
 
 import (
 	"api-template/config"
+	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
 	"fmt"
 	"net/http"
 )
 
-func Run() error {
-	port := fmt.Sprintf(":%d", config.AppConfig.HttpPort)
+// RunHealth starts a server for healthcheck status
+func RunHealth() error {
+	addr := fmt.Sprintf(":%d", config.AppConfig.HttpHealthPort)
+
+	http.HandleFunc("/health", health.GetHealth().Handler)
+
+	return http.ListenAndServe(addr, nil)
+}
+
+// RunServer serves de API
+func RunServer() error {
+	addr := fmt.Sprintf(":%d", config.AppConfig.HttpPort)
 
 	// system
 	SystemApiService := server.NewSystemApiService()
@@ -16,5 +27,5 @@ func Run() error {
 
 	router := server.NewRouter(SystemApiController)
 
-	return http.ListenAndServe(port, router)
+	return http.ListenAndServe(addr, router)
 }
