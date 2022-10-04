@@ -6,5 +6,13 @@ type AppConf struct {
 	LogLevel       string `envconfig:"LOG_LEVEL" default:"info"`
 	AppVersion     string `envconfig:"APP_VERSION" default:"v1.0.0"`
 	HttpHealthPort int    `envconfig:"HTTP_HEALTH_PORT" default:"8079"`
-	HttpPort       int    `envconfig:"HTTP_PORT" default:"8080"`
+}
+
+var ServerConfig ServerConf
+
+type ServerConf struct {
+	Port         int `envconfig:"HTTP_PORT" default:"8080"`
+	WriteTimeout int `envconfig:"HTTP_WRITE_TIMEOUT" default:"15"`
+	ReadTimeout  int `envconfig:"HTTP_READ_TIMEOUT" default:"15"`
+	IdleTimeout  int `envconfig:"HTTP_IDLE_TIMEOUT" default:"60"`
 }
