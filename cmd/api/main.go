@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -38,35 +39,27 @@ func init() {
 }
 
 func main() {
-	var wait time.Duration
+	var gracefulTime = time.Second * time.Duration(config.ServerConfig.GracefulTime)
 	srv := bootstrap.NewServer()
 
 	// https://github.com/gorilla/mux#graceful-shutdown
-	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		logger.Infof("server starting on port :%d", config.ServerConfig.Port)
-		if err := srv.ListenAndServe(); err != nil {
+		logger.Infof("http server starting on port :%d", config.ServerConfig.Port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal(err)
 		}
 	}()
 
 	c := make(chan os.Signal, 1)
-	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
-	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
 	signal.Notify(c, os.Interrupt)
 
-	// Block until we receive our signal.
 	<-c
 
-	// Create a deadline to wait for.
-	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	ctx, cancel := context.WithTimeout(context.Background(), gracefulTime)
 	defer cancel()
-	// Doesn't block if no connections, but will otherwise wait
-	// until the timeout deadline.
+
 	_ = srv.Shutdown(ctx)
-	// Optionally, you could run srv.Shutdown in a goroutine and block on
-	// <-ctx.Done() if your application should wait for other services
-	// to finalize based on context cancellation.
-	logger.Warn("server shutting down")
+
+	logger.Warn("http server closed")
 	os.Exit(0)
 }
