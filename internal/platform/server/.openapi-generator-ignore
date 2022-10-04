@@ -9,5 +9,5 @@ api/
 # Markdown files
 *.md
 
-# ignore unused files
-openapi/logger.go
+# ignore services
+openapi/api_system_service.go
