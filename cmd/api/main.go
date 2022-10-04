@@ -19,7 +19,7 @@ func init() {
 	}
 
 	if err := envconfig.Process("", &config.ServerConfig); err != nil {
-		logger.Fatal("environment variables could not be processed")
+		logger.Fatal("SERVER environment variables could not be processed")
 	}
 
 	if err := logger.ParseLevel(config.AppConfig.LogLevel); err != nil {
