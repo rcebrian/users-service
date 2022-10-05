@@ -8,6 +8,9 @@ info:
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://localhost:8080'
+    description: localhost
 tags:
   - name: system
     description: System health operations
@@ -21,53 +24,5 @@ paths:
       operationId: getHealth
       x-internal: true
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Healthcheck'
-servers:
-  - url: 'http://localhost:8080'
-    description: localhost
-components:
-  schemas:
-    Healthcheck:
-      type: object
-      properties:
-        status:
-          type: string
-        version:
-          type: string
-        releaseId:
-          type: string
-        checks:
-          type: object
-          properties:
-            uptime:
-              type: array
-              items:
-                type: object
-                properties:
-                  componentType:
-                    type: string
-                  observedValue:
-                    type: integer
-                  observedUnit:
-                    type: string
-                  status:
-                    type: string
-                  time:
-                    type: string
-      x-examples:
-        example-1:
-          status: pass
-          version: v1.0.0
-          releaseId: v1.0.0
-          checks:
-            uptime:
-              - componentType: system
-                observedValue: 4100
-                observedUnit: s
-                status: pass
-                time: '2022-10-02T19:40:18.796950709Z'
+        '501':
+          description: Not Implemented
