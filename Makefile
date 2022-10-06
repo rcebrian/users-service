@@ -5,3 +5,6 @@ api-clean:
 
 api-codegen: api-clean
 	scripts/api/codegen.sh
+
+fmt:
+	goimports -w .
