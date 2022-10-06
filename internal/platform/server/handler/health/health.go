@@ -2,6 +2,7 @@ package health
 
 import (
 	"api-template/config"
+
 	"github.com/nelkinda/health-go"
 	"github.com/nelkinda/health-go/checks/uptime"
 )
