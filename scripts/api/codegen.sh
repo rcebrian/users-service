@@ -11,7 +11,7 @@ OUTPUT_DIR="internal/platform/server"
 TEMPLATE_ENGINE="mustache"
 TEMPLATE_DIR="api/openapi-spec/template"
 
-export GO_POST_PROCESS_FILE="gofmt -w"
+export GO_POST_PROCESS_FILE="goimports -w"
 openapi-generator-cli generate --generator-name go-server \
   --input-spec $SPECS_FILE \
   --config $CONFIG_FILE \
