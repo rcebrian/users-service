@@ -5,12 +5,13 @@ import (
 	"api-template/config"
 	"api-template/pkg/logger"
 	"context"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
