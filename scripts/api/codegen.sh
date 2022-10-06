@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+: <<DOCS
+Generate http server controllers and models via OpenAPI Generator with custom configuration.
+DOCS
+
 
 SPECS_FILE="api/openapi-spec/openapi.yaml"
 CONFIG_FILE="api/openapi-spec/config.yaml"

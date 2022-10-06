@@ -1,5 +1,7 @@
-api_gen:
-	bash scripts/openapi.sh
+SHELL = /bin/bash
 
-api_clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go' -delete
+api-clean:
+	scripts/api/clean.sh
+
+api-codegen: api-clean
+	scripts/api/codegen.sh
