@@ -4,6 +4,7 @@ import (
 	"api-template/config"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
+	"api-template/internal/platform/storage/memory"
 	"fmt"
 	"net/http"
 	"time"
@@ -22,11 +23,10 @@ func RunHealth() error {
 func NewServer() *http.Server {
 	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
 
-	// system
-	SystemApiService := server.NewSystemApiService()
-	SystemApiController := server.NewSystemApiController(SystemApiService)
+	// users
+	UsersApiController := usersApiController()
 
-	router := server.NewRouter(SystemApiController)
+	router := server.NewRouter(UsersApiController)
 
 	return &http.Server{
 		Addr: addr,
@@ -36,4 +36,12 @@ func NewServer() *http.Server {
 		IdleTimeout:  time.Second * time.Duration(config.ServerConfig.IdleTimeout),
 		Handler:      router,
 	}
+}
+
+// usersApiController configure users controller with dependency injection
+func usersApiController() server.Router {
+	userRepo := memory.NewUserRepository()
+
+	UsersApiService := server.NewUsersApiService(userRepo)
+	return server.NewUsersApiController(UsersApiService)
 }
