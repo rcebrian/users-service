@@ -40,11 +40,13 @@ func init() {
 
 func main() {
 	var gracefulTime = time.Second * time.Duration(config.ServerConfig.GracefulTime)
+
 	srv := bootstrap.NewServer()
 
 	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
 		logger.Infof("http server starting on port :%d", config.ServerConfig.Port)
+
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal(err)
 		}
