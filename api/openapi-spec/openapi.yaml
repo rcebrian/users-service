@@ -34,7 +34,7 @@ paths:
         - users
       operationId: getAllUsers
       summary: Get all users
-      description: Retrieve all users from datasource
+      description: Retrieve all users from data storage
       responses:
         '200':
           description: Ok
@@ -44,6 +44,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+    post:
+      summary: Create user
+      operationId: createUser
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      description: Save user into data storage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      tags:
+        - users
   '/users/{userId}':
     get:
       summary: Get user by id
@@ -78,6 +96,7 @@ components:
       x-stoplight:
         id: e04lplqp2mw1t
       type: object
+      description: ''
       properties:
         id:
           type: integer
@@ -85,4 +104,6 @@ components:
           type: string
         firstname:
           type: string
-      description: ''
+      required:
+        - name
+        - firstname

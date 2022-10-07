@@ -20,6 +20,16 @@ func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
 	}
 }
 
+// CreateUser - Save user into data storage
+func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
+	err := s.userRepository.Save(ctx, model.NewUser(int(dto.Id), dto.Name, dto.Firstname))
+	if err != nil {
+		return Response(http.StatusInternalServerError, nil), err
+	}
+
+	return Response(http.StatusCreated, nil), err
+}
+
 // GetAllUsers - Get all users
 func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error) {
 	users, err := s.userRepository.FindAll(ctx)
