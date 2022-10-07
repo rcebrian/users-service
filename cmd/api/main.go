@@ -36,7 +36,6 @@ func init() {
 			logger.Fatal(err)
 		}
 	}()
-
 }
 
 func main() {

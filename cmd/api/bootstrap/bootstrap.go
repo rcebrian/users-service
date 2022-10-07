@@ -43,5 +43,6 @@ func usersApiController() server.Router {
 	userRepo := memory.NewUserRepository()
 
 	UsersApiService := server.NewUsersApiService(userRepo)
+
 	return server.NewUsersApiController(UsersApiService)
 }
