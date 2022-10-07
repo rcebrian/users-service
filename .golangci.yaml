@@ -1,14 +1,20 @@
 # https://golangci-lint.run/usage/linters/
 linters:
+  disable:
+    - typecheck
   enable:
+    - bidichk
+    - bodyclose
     - errcheck
-    - gofmt
+    - errname
+    - godox
     - goimports
     - gosimple
     - govet
     - ineffassign
-    - nlreturn
+    - nilnil
     - staticcheck
-    - typecheck
     - unused
+    - usestdlibvars
     - whitespace
+    - wsl
