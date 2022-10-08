@@ -2,14 +2,14 @@ SHELL = /bin/bash
 MAKEFLAGS += --silent
 
 .PHONY: build
-build: api
+build:
 	go build -o ./build/api ./cmd/api/main.go
 
 build-clean:
 	rm -f ./build/*
 
 .PHONY: api
-api: api-clean
+api:
 	scripts/api/codegen.sh
 
 api-clean:
@@ -17,3 +17,7 @@ api-clean:
 
 lint:
 	golangci-lint run
+
+clean: build-clean api-clean
+
+all: clean api build
