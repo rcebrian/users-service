@@ -21,6 +21,7 @@ func NewUserRepository() model.UserRepository {
 
 func (u *UserRepository) Save(_ context.Context, user model.User) error {
 	u.users = append(u.users, user)
+
 	return nil
 }
 
@@ -30,6 +31,7 @@ func (u *UserRepository) FindById(_ context.Context, id int) (model.User, error)
 			return u.users[i], nil
 		}
 	}
+
 	return model.User{}, nil
 }
 

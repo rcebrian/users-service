@@ -1,10 +1,23 @@
 SHELL = /bin/bash
+MAKEFLAGS += --silent
 
-api-clean:
-	scripts/api/clean.sh
+.PHONY: build
+build:
+	go build -o ./build/api ./cmd/api/main.go
 
-api-codegen: api-clean
+build-clean:
+	rm -f ./build/*
+
+.PHONY: api
+api:
 	scripts/api/codegen.sh
 
-fmt:
-	goimports -w .
+api-clean:
+	find internal/platform/server/openapi -type f -not -name '*_service.go' -delete
+
+lint:
+	golangci-lint run
+
+clean: build-clean api-clean
+
+all: clean api build

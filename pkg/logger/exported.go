@@ -9,6 +9,7 @@ import (
 // ParseLevel takes a string level and returns the Logrus log level constant.
 func ParseLevel(lvl string) error {
 	_, err := logrus.ParseLevel(lvl)
+
 	return err
 }
 

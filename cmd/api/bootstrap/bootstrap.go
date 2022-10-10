@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// RunHealth starts a server for healthcheck status
-func RunHealth() error {
+// RunInternalServer starts a server for healthcheck status
+func RunInternalServer() error {
 	addr := fmt.Sprintf(":%d", config.AppConfig.HttpHealthPort)
 
 	http.HandleFunc("/health", health.GetHealth().Handler)
@@ -43,5 +43,6 @@ func usersApiController() server.Router {
 	userRepo := memory.NewUserRepository()
 
 	UsersApiService := server.NewUsersApiService(userRepo)
+
 	return server.NewUsersApiController(UsersApiService)
 }
