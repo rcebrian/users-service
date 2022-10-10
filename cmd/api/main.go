@@ -32,7 +32,7 @@ func init() {
 	go func() {
 		logger.Debugf("healthcheck running on :%d/health", config.AppConfig.HttpHealthPort)
 
-		if err := bootstrap.RunHealth(); err != nil {
+		if err := bootstrap.RunInternalServer(); err != nil {
 			logger.Fatal(err)
 		}
 	}()
