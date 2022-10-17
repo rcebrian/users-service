@@ -30,7 +30,7 @@ func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 
 	go func() {
-		logger.Debugf("healthcheck running on :%d/health", config.AppConfig.HttpHealthPort)
+		logger.Debugf("healthcheck running on :%d/health", config.AppConfig.HttpInternalPort)
 
 		if err := bootstrap.RunInternalServer(); err != nil {
 			logger.Fatal(err)

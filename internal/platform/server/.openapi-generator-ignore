@@ -9,6 +9,9 @@ api/
 # Markdown files
 *.md
 
+# default logger middleware
+openapi/logger.go
+
 # ignore services
 openapi/api_system_service.go
 openapi/api_users_service.go

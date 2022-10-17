@@ -8,15 +8,18 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer() error {
-	addr := fmt.Sprintf(":%d", config.AppConfig.HttpHealthPort)
+	addr := fmt.Sprintf(":%d", config.AppConfig.HttpInternalPort)
+	router := mux.NewRouter()
 
-	http.HandleFunc("/health", health.GetHealth().Handler)
+	router.HandleFunc("/health", health.GetHealth().Handler)
 
-	return http.ListenAndServe(addr, nil)
+	return http.ListenAndServe(addr, router)
 }
 
 // NewServer create a new configured server
