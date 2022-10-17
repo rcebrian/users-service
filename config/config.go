@@ -17,5 +17,3 @@ type ServerConf struct {
 	ReadTimeout  int `envconfig:"HTTP_READ_TIMEOUT" default:"15"`
 	IdleTimeout  int `envconfig:"HTTP_IDLE_TIMEOUT" default:"60"`
 }
-
-// the duration for which the server gracefully wait for existing connections to finish
