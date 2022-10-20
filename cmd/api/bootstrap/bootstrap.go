@@ -12,16 +12,27 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/mvrilo/go-redoc"
 )
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer() error {
 	addr := fmt.Sprintf(":%d", config.AppConfig.HttpInternalPort)
-	router := mux.NewRouter()
+	internal := mux.NewRouter()
+	internal.HandleFunc("/health", health.GetHealth().Handler)
 
-	router.HandleFunc("/health", health.GetHealth().Handler)
+	doc := redoc.Redoc{
+		Title:       "API Docs",
+		Description: "API documentation",
+		SpecFile:    "./api/openapi-spec/openapi.yaml",
+		SpecPath:    "/openapi.yaml",
+		DocsPath:    "/docs",
+	}
 
-	return http.ListenAndServe(addr, router)
+	internal.HandleFunc(doc.DocsPath, doc.Handler())
+	internal.HandleFunc(doc.SpecPath, doc.Handler())
+
+	return http.ListenAndServe(addr, internal)
 }
 
 // NewServer create a new configured server
