@@ -7,6 +7,7 @@ import (
 {{#routers}}
 	{{#mux}}
 	"github.com/gorilla/mux"
+	"api-template/internal/platform/server/middleware/logging"
 	{{#featureCORS}}
 	"github.com/gorilla/handlers"
 	{{/featureCORS}}
@@ -65,7 +66,7 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 			handler = route.HandlerFunc
 {{#routers}}
 	{{#mux}}
-			handler = Logger(handler)
+			handler = logging.Middleware(handler)
 			{{#featureCORS}}
 			handler = handlers.CORS()(handler)
 			{{/featureCORS}}

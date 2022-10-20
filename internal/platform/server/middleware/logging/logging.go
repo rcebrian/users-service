@@ -1,5 +1,4 @@
-{{>partial_header}}
-package {{packageName}}
+package logging
 
 import (
 	"api-template/pkg/logger"
@@ -17,7 +16,7 @@ func (r *StatusRecorder) WriteHeader(status int) {
 	r.ResponseWriter.WriteHeader(status)
 }
 
-func Logger(inner http.Handler) http.Handler {
+func Middleware(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
