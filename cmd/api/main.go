@@ -23,6 +23,10 @@ func init() {
 		logger.Fatal("SERVER environment variables could not be processed")
 	}
 
+	if err := envconfig.Process("", &config.MySqlConfig); err != nil {
+		logger.Fatal("DATABASE environment variables could not be processed")
+	}
+
 	if err := logger.ParseLevel(config.AppConfig.LogLevel); err != nil {
 		logger.Fatal("error parsing log level")
 	}

@@ -4,11 +4,13 @@ import (
 	"api-template/config"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
-	"api-template/internal/platform/storage/memory"
+	"api-template/internal/platform/storage/mysql"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
@@ -24,10 +26,13 @@ func RunInternalServer() error {
 
 // NewServer create a new configured server
 func NewServer() *http.Server {
+	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.MySqlConfig.User, config.MySqlConfig.Passwd, config.MySqlConfig.Host, config.MySqlConfig.Port, config.MySqlConfig.Database)
+	db, _ := sql.Open("mysql", mysqlURI)
+
 	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
 
 	// users
-	UsersApiController := usersApiController()
+	UsersApiController := usersApiController(db)
 
 	router := server.NewRouter(UsersApiController)
 
@@ -42,8 +47,8 @@ func NewServer() *http.Server {
 }
 
 // usersApiController configure users controller with dependency injection
-func usersApiController() server.Router {
-	userRepo := memory.NewUserRepository()
+func usersApiController(db *sql.DB) server.Router {
+	userRepo := mysql.NewCourseRepository(db)
 
 	UsersApiService := server.NewUsersApiService(userRepo)
 

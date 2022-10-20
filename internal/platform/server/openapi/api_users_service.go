@@ -22,7 +22,7 @@ func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
 
 // CreateUser - Save user into data storage
 func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
-	err := s.userRepository.Save(ctx, model.NewUser(int(dto.Id), dto.Name, dto.Firstname))
+	err := s.userRepository.Save(ctx, model.NewUser(dto.Id, dto.Name, dto.Firstname))
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
@@ -40,7 +40,7 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 	var usersDto = make([]UserDto, len(users))
 
 	for i := range users {
-		usersDto[i].Id = int32(users[i].ID())
+		usersDto[i].Id = users[i].ID()
 		usersDto[i].Name = users[i].Name()
 		usersDto[i].Firstname = users[i].Firstname()
 	}
@@ -50,17 +50,17 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 
 // GetUserById - Get user by id
 func (s *UsersApiService) GetUserById(ctx context.Context, userId int32) (ImplResponse, error) {
-	user, err := s.userRepository.FindById(ctx, int(userId))
+	user, err := s.userRepository.FindById(ctx, string(userId))
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
 
-	if user.ID() == 0 {
+	if user.ID() == "" {
 		return Response(http.StatusNotFound, nil), err
 	}
 
 	return Response(http.StatusOK, UserDto{
-		Id:        int32(user.ID()),
+		Id:        user.ID(),
 		Name:      user.Name(),
 		Firstname: user.Firstname(),
 	}), nil

@@ -82,9 +82,7 @@ paths:
       description: Retrieve user information from ID
     parameters:
       - schema:
-          type: integer
-          exclusiveMinimum: true
-          minimum: 0
+          type: string
         name: userId
         in: path
         required: true
@@ -99,7 +97,7 @@ components:
       description: ''
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         firstname:
