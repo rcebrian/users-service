@@ -12,6 +12,9 @@ require (
 )
 
 require (
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/huandu/go-sqlbuilder v1.16.0 // indirect
+	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/nelkinda/http-go v0.0.1 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )

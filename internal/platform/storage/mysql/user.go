@@ -1,7 +1,11 @@
 package mysql
 
+const (
+	sqlUserTable = "users"
+)
+
 type sqlUser struct {
-	id        string `db:"id"`
-	name      string `db:"name"`
-	firstname string `db:"firstname"`
+	ID        string `db:"id"`
+	Name      string `db:"name"`
+	Firstname string `db:"firstname"`
 }

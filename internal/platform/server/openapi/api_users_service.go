@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-// UsersApiService is a service that implements the logic for the UsersApiServicer
-// This service should implement the business logic for every endpoint for the UsersApi API.
-// Include any external packages or services that will be required by this service.
+// UsersApiService is a users that implements the logic for the UsersApiServicer
+// This users should implement the business logic for every endpoint for the UsersApi API.
+// Include any external packages or services that will be required by this users.
 type UsersApiService struct {
 	userRepository model.UserRepository
 }
 
-// NewUsersApiService creates a default api service
+// NewUsersApiService creates a default api users
 func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
 	return &UsersApiService{
 		userRepository: repository,
@@ -22,7 +22,12 @@ func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
 
 // CreateUser - Save user into data storage
 func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
-	err := s.userRepository.Save(ctx, model.NewUser(dto.Id, dto.Name, dto.Firstname))
+	user, err := model.NewUser(dto.Id, dto.Name, dto.Firstname)
+	if err != nil {
+		return Response(http.StatusBadRequest, nil), err
+	}
+
+	err = s.userRepository.Save(ctx, user)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
@@ -40,28 +45,28 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 	var usersDto = make([]UserDto, len(users))
 
 	for i := range users {
-		usersDto[i].Id = users[i].ID()
-		usersDto[i].Name = users[i].Name()
-		usersDto[i].Firstname = users[i].Firstname()
+		usersDto[i].Id = users[i].ID().String()
+		usersDto[i].Name = users[i].Name().String()
+		usersDto[i].Firstname = users[i].Firstname().String()
 	}
 
 	return Response(http.StatusOK, usersDto), nil
 }
 
 // GetUserById - Get user by id
-func (s *UsersApiService) GetUserById(ctx context.Context, userId int32) (ImplResponse, error) {
-	user, err := s.userRepository.FindById(ctx, string(userId))
+func (s *UsersApiService) GetUserById(ctx context.Context, userId string) (ImplResponse, error) {
+	user, err := s.userRepository.FindById(ctx, userId)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
 
-	if user.ID() == "" {
+	if user.ID().String() == "" {
 		return Response(http.StatusNotFound, nil), err
 	}
 
 	return Response(http.StatusOK, UserDto{
-		Id:        user.ID(),
-		Name:      user.Name(),
-		Firstname: user.Firstname(),
+		Id:        user.ID().String(),
+		Name:      user.Name().String(),
+		Firstname: user.Firstname().String(),
 	}), nil
 }

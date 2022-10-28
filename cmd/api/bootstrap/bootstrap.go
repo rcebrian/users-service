@@ -59,7 +59,7 @@ func NewServer() *http.Server {
 
 // usersApiController configure users controller with dependency injection
 func usersApiController(db *sql.DB) server.Router {
-	userRepo := mysql.NewCourseRepository(db)
+	userRepo := mysql.NewUserRepository(db)
 
 	UsersApiService := server.NewUsersApiService(userRepo)
 
