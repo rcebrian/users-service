@@ -2,9 +2,15 @@ package logger
 
 import (
 	"context"
+	"io"
 
 	"github.com/sirupsen/logrus"
 )
+
+// SetOutput sets the standard logger output.
+func SetOutput(out io.Writer) {
+	logrus.SetOutput(out)
+}
 
 // ParseLevel takes a string level and returns the Logrus log level constant.
 func ParseLevel(lvl string) error {
