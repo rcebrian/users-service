@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	mooc "api-template/internal"
+	users "api-template/internal"
 	"api-template/pkg/logger"
 	"context"
 	"database/sql"
@@ -9,19 +9,20 @@ import (
 	"github.com/huandu/go-sqlbuilder"
 )
 
-// UserRepository is a MySQL mooc.UserRepository implementation.
+// UserRepository is a MySQL users.UserRepository implementation.
 type UserRepository struct {
 	db *sql.DB
 }
 
 // NewUserRepository initializes a MySQL-based implementation of users.UserRepository.
-func NewUserRepository(db *sql.DB) mooc.UserRepository {
+func NewUserRepository(db *sql.DB) users.UserRepository {
 	return &UserRepository{
 		db: db,
 	}
 }
 
-func (r *UserRepository) Save(ctx context.Context, user mooc.User) error {
+// Save a users.User in persistence
+func (r *UserRepository) Save(ctx context.Context, user users.User) error {
 	userSQLStruct := sqlbuilder.NewStruct(new(sqlUser))
 
 	query, args := userSQLStruct.InsertInto(sqlUserTable, sqlUser{
@@ -39,30 +40,32 @@ func (r *UserRepository) Save(ctx context.Context, user mooc.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindById(ctx context.Context, id string) (user mooc.User, err error) {
+// FindById search a users.User by unique id
+func (r *UserRepository) FindById(ctx context.Context, id string) (user users.User, err error) {
 	var dbUser sqlUser
 
 	err = r.db.QueryRow("SELECT * FROM users WHERE id = ?", id).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname)
 	if err != nil {
-		return mooc.User{}, err
+		return users.User{}, err
 	}
 
-	user, err = mooc.NewUser(dbUser.ID, dbUser.Name, dbUser.Firstname)
+	user, err = users.NewUser(dbUser.ID, dbUser.Name, dbUser.Firstname)
 	if err != nil {
-		return mooc.User{}, nil
+		return users.User{}, nil
 	}
 
 	return user, nil
 }
 
-func (r *UserRepository) FindAll(ctx context.Context) ([]mooc.User, error) {
+// FindAll get all users.User from persistence
+func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
 	rows, err := r.db.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
 
 	var dbUser sqlUser
-	var users []mooc.User
+	var results []users.User
 
 	defer rows.Close()
 	for rows.Next() { //nolint:wsl
@@ -71,17 +74,17 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]mooc.User, error) {
 			continue
 		}
 
-		user, newUserErr := mooc.NewUser(dbUser.ID, dbUser.Name, dbUser.Firstname)
+		user, newUserErr := users.NewUser(dbUser.ID, dbUser.Name, dbUser.Firstname)
 		if err != nil {
 			return nil, newUserErr
 		}
 
-		users = append(users, user)
+		results = append(results, user)
 	}
 
 	if err != nil {
 		logger.WithError(err).Error("error closing query")
 	}
 
-	return users, nil
+	return results, nil
 }
