@@ -37,17 +37,17 @@ func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResp
 
 // GetAllUsers - Get all users
 func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error) {
-	users, err := s.userRepository.FindAll(ctx)
+	all, err := s.userRepository.FindAll(ctx)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
 
-	var usersDto = make([]UserDto, len(users))
+	var usersDto = make([]UserDto, len(all))
 
-	for i := range users {
-		usersDto[i].Id = users[i].ID().String()
-		usersDto[i].Name = users[i].Name().String()
-		usersDto[i].Firstname = users[i].Firstname().String()
+	for i := range all {
+		usersDto[i].Id = all[i].ID().String()
+		usersDto[i].Name = all[i].Name().String()
+		usersDto[i].Firstname = all[i].Firstname().String()
 	}
 
 	return Response(http.StatusOK, usersDto), nil
