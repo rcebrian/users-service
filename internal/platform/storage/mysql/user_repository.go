@@ -44,7 +44,7 @@ func (r *UserRepository) Save(ctx context.Context, user users.User) error {
 func (r *UserRepository) FindById(ctx context.Context, id string) (user users.User, err error) {
 	var dbUser sqlUser
 
-	err = r.db.QueryRow("SELECT * FROM users WHERE id = ?", id).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname)
+	err = r.db.QueryRow("SELECT * FROM users WHERE id = ?  LIMIT 1", id).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname)
 	if err != nil {
 		return users.User{}, err
 	}
