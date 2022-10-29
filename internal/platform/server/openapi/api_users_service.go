@@ -1,7 +1,7 @@
 package server
 
 import (
-	model "api-template/internal"
+	users "api-template/internal"
 	"context"
 	"net/http"
 )
@@ -10,11 +10,11 @@ import (
 // This users should implement the business logic for every endpoint for the UsersApi API.
 // Include any external packages or services that will be required by this users.
 type UsersApiService struct {
-	userRepository model.UserRepository
+	userRepository users.UserRepository
 }
 
 // NewUsersApiService creates a default api users
-func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
+func NewUsersApiService(repository users.UserRepository) UsersApiServicer {
 	return &UsersApiService{
 		userRepository: repository,
 	}
@@ -22,7 +22,7 @@ func NewUsersApiService(repository model.UserRepository) UsersApiServicer {
 
 // CreateUser - Save user into data storage
 func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
-	user, err := model.NewUser(dto.Id, dto.Name, dto.Firstname)
+	user, err := users.NewUser(dto.Id, dto.Name, dto.Firstname)
 	if err != nil {
 		return Response(http.StatusBadRequest, nil), err
 	}
