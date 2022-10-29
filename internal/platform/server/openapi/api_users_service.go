@@ -8,7 +8,7 @@ import (
 
 // UsersApiService is a users that implements the logic for the UsersApiServicer
 // This users should implement the business logic for every endpoint for the UsersApi API.
-// Include any external packages or services that will be required by this users.
+// Include any external packages or services that will be required by these users.
 type UsersApiService struct {
 	userRepository users.UserRepository
 }
