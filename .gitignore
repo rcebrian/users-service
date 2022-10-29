@@ -1,11 +1,13 @@
 # binaries
 build/
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# tests
+coverage/
 *.out
 
 # IDEs
 .idea/
+.fleet/
 
 # api gen
 internal/platform/server/.openapi-generator
