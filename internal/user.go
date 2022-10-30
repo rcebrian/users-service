@@ -2,13 +2,10 @@ package users
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 )
-
-var ErrInvalidUserID = errors.New("invalid User ID")
 
 // UserID represents the course unique identifier.
 type UserID struct {
@@ -32,8 +29,6 @@ func (id UserID) String() string {
 	return id.value
 }
 
-var ErrEmptyUserName = errors.New("the field User Name can not be empty")
-
 // CourseName represents the course name.
 type CourseName struct {
 	value string
@@ -54,8 +49,6 @@ func NewCourseName(value string) (CourseName, error) {
 func (name CourseName) String() string {
 	return name.value
 }
-
-var ErrEmptyFirstname = errors.New("the field Firstname can not be empty")
 
 // CourseFirstname represents the course duration.
 type CourseFirstname struct {

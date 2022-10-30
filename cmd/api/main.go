@@ -3,8 +3,11 @@ package main
 import (
 	"api-template/cmd/api/bootstrap"
 	"api-template/config"
+	"api-template/internal/platform/storage/mysql"
 	"api-template/pkg/logger"
 	"context"
+	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -43,9 +46,14 @@ func init() {
 }
 
 func main() {
+	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.MySqlConfig.User, config.MySqlConfig.Passwd, config.MySqlConfig.Host, config.MySqlConfig.Port, config.MySqlConfig.Database)
+	db, _ := sql.Open("mysql", mysqlURI)
+
+	userRepo := mysql.NewUserRepository(db)
+
 	var gracefulTime = time.Second * time.Duration(config.ServerConfig.GracefulTime)
 
-	srv := bootstrap.NewServer()
+	srv := bootstrap.NewServer(userRepo)
 
 	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {

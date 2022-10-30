@@ -33,7 +33,6 @@ func (r *UserRepository) Save(ctx context.Context, user users.User) error {
 
 	_, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		logger.WithError(err).Error("error trying to persist user on database")
 		return err
 	}
 

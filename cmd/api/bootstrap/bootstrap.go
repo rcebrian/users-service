@@ -2,10 +2,11 @@ package bootstrap
 
 import (
 	"api-template/config"
+	users "api-template/internal"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
-	"api-template/internal/platform/storage/mysql"
-	"database/sql"
+	creating "api-template/internal/users"
+	"api-template/internal/users/finding"
 	"fmt"
 	"net/http"
 	"time"
@@ -36,14 +37,11 @@ func RunInternalServer() error {
 }
 
 // NewServer create a new configured server
-func NewServer() *http.Server {
-	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.MySqlConfig.User, config.MySqlConfig.Passwd, config.MySqlConfig.Host, config.MySqlConfig.Port, config.MySqlConfig.Database)
-	db, _ := sql.Open("mysql", mysqlURI)
-
+func NewServer(userRepo users.UserRepository) *http.Server {
 	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
 
 	// users
-	UsersApiController := usersApiController(db)
+	UsersApiController := usersApiController(userRepo)
 
 	router := server.NewRouter(UsersApiController)
 
@@ -58,10 +56,12 @@ func NewServer() *http.Server {
 }
 
 // usersApiController configure users controller with dependency injection
-func usersApiController(db *sql.DB) server.Router {
-	userRepo := mysql.NewUserRepository(db)
+func usersApiController(userRepo users.UserRepository) server.Router {
+	createService := creating.NewCreatingService(userRepo)
+	findAllService := finding.NewFindAllUsersUseCase(userRepo)
+	findByIdService := finding.NewFindUserByIdUseCase(userRepo)
 
-	UsersApiService := server.NewUsersApiService(userRepo)
+	UsersApiService := server.NewUsersApiService(createService, findAllService, findByIdService)
 
 	return server.NewUsersApiController(UsersApiService)
 }

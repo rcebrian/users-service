@@ -2,7 +2,10 @@ package server
 
 import (
 	users "api-template/internal"
+	creating "api-template/internal/users"
+	"api-template/internal/users/finding"
 	"context"
+	"errors"
 	"net/http"
 )
 
@@ -10,26 +13,33 @@ import (
 // This users should implement the business logic for every endpoint for the UsersApi API.
 // Include any external packages or services that will be required by these users.
 type UsersApiService struct {
-	userRepository users.UserRepository
+	creatingService creating.CreateUserService
+	findAllService  finding.FindAllUsersUseCase
+	findByIdService finding.FindUserByIdUseCase
 }
 
 // NewUsersApiService creates a default api users
-func NewUsersApiService(repository users.UserRepository) UsersApiServicer {
+func NewUsersApiService(creatingService creating.CreateUserService, findAllService finding.FindAllUsersUseCase, findByIdService finding.FindUserByIdUseCase) UsersApiServicer {
 	return &UsersApiService{
-		userRepository: repository,
+		creatingService: creatingService,
+		findAllService:  findAllService,
+		findByIdService: findByIdService,
 	}
 }
 
 // CreateUser - Save user into data storage
 func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
-	user, err := users.NewUser(dto.Id, dto.Name, dto.Firstname)
-	if err != nil {
-		return Response(http.StatusBadRequest, nil), err
-	}
+	err := s.creatingService.Create(ctx, dto.Id, dto.Name, dto.Firstname)
 
-	err = s.userRepository.Save(ctx, user)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		switch {
+		case errors.Is(err, users.ErrInvalidUserID),
+			errors.Is(err, users.ErrEmptyUserName),
+			errors.Is(err, users.ErrEmptyFirstname):
+			return Response(http.StatusNotFound, nil), err
+		default:
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(http.StatusCreated, nil), err
@@ -37,7 +47,7 @@ func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResp
 
 // GetAllUsers - Get all users
 func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error) {
-	all, err := s.userRepository.FindAll(ctx)
+	all, err := s.findAllService.FindAll(ctx)
 	if err != nil {
 		return Response(http.StatusInternalServerError, nil), err
 	}
@@ -55,13 +65,15 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 
 // GetUserById - Get user by id
 func (s *UsersApiService) GetUserById(ctx context.Context, userId string) (ImplResponse, error) {
-	user, err := s.userRepository.FindById(ctx, userId)
-	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
-	}
+	user, err := s.findByIdService.FindById(ctx, userId)
 
-	if user.ID().String() == "" {
-		return Response(http.StatusNotFound, nil), err
+	if err != nil {
+		switch {
+		case errors.Is(err, users.ErrNotFound):
+			return Response(http.StatusNotFound, nil), err
+		default:
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(http.StatusOK, UserDto{
