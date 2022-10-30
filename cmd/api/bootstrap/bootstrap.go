@@ -5,7 +5,7 @@ import (
 	users "api-template/internal"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
-	creating "api-template/internal/users"
+	"api-template/internal/users/creating"
 	"api-template/internal/users/finding"
 	"fmt"
 	"net/http"

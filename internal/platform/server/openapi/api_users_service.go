@@ -2,7 +2,7 @@ package server
 
 import (
 	users "api-template/internal"
-	creating "api-template/internal/users"
+	"api-template/internal/users/creating"
 	"api-template/internal/users/finding"
 	"context"
 	"errors"
