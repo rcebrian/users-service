@@ -91,8 +91,6 @@ components:
   schemas:
     User:
       title: User
-      x-stoplight:
-        id: e04lplqp2mw1t
       type: object
       description: ''
       properties:
