@@ -15,3 +15,4 @@ internal/platform/server/openapi/*.go
 
 # not ignore services
 !internal/platform/server/openapi/*_service.go
+!internal/platform/server/openapi/*mapper*.go

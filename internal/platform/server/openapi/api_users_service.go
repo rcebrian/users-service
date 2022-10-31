@@ -52,15 +52,7 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 		return Response(http.StatusInternalServerError, nil), err
 	}
 
-	var usersDto = make([]UserDto, len(all))
-
-	for i := range all {
-		usersDto[i].Id = all[i].ID().String()
-		usersDto[i].Name = all[i].Name().String()
-		usersDto[i].Firstname = all[i].Firstname().String()
-	}
-
-	return Response(http.StatusOK, usersDto), nil
+	return Response(http.StatusOK, UsersToUserDtos(all)), nil
 }
 
 // GetUserById - Get user by id
@@ -76,9 +68,5 @@ func (s *UsersApiService) GetUserById(ctx context.Context, userId string) (ImplR
 		}
 	}
 
-	return Response(http.StatusOK, UserDto{
-		Id:        user.ID().String(),
-		Name:      user.Name().String(),
-		Firstname: user.Firstname().String(),
-	}), nil
+	return Response(http.StatusOK, UserToUserDto(user)), nil
 }
