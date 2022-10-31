@@ -4,10 +4,12 @@ import (
 	users "api-template/internal"
 	"api-template/pkg/logger"
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type CreateUserService interface {
-	Create(ctx context.Context, id, name, firstname string) error
+	Create(ctx context.Context, name, firstname string) error
 }
 
 type createUserUseCase struct {
@@ -18,8 +20,10 @@ func NewCreatingService(repository users.UserRepository) CreateUserService {
 	return createUserUseCase{repository: repository}
 }
 
-func (c createUserUseCase) Create(ctx context.Context, id, name, firstname string) error {
-	user, err := users.NewUser(id, name, firstname)
+func (c createUserUseCase) Create(ctx context.Context, name, firstname string) error {
+	id := uuid.New()
+
+	user, err := users.NewUser(id.String(), name, firstname)
 	if err != nil {
 		logger.WithError(err).Error("persisting user on database")
 		return err

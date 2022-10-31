@@ -29,7 +29,7 @@ func NewUsersApiService(creatingService creating.CreateUserService, findAllServi
 
 // CreateUser - Save user into data storage
 func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResponse, error) {
-	err := s.creatingService.Create(ctx, dto.Id, dto.Name, dto.Firstname)
+	err := s.creatingService.Create(ctx, dto.Name, dto.Firstname)
 
 	if err != nil {
 		switch {
