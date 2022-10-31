@@ -13,7 +13,7 @@ api:
 	scripts/api/codegen.sh
 
 api-clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go' -delete
+	find internal/platform/server/openapi -type f -not -name '*_service.go' -and ! -name '*mapper*.go' -delete
 
 lint:
 	goimports -w .
