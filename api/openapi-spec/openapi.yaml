@@ -52,6 +52,13 @@ paths:
           description: Created
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
         '500':
           description: Internal Server Error
       description: Save user into data storage
@@ -103,3 +110,4 @@ components:
       required:
         - name
         - firstname
+  responses: {}
