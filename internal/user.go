@@ -77,6 +77,8 @@ type UserRepository interface {
 	FindAll(ctx context.Context) ([]User, error)
 }
 
+//go:generate mockery --case=snake --outpkg=mocks --output=platform/storage/mocks --name=UserRepository
+
 // User is the data structure that represents a course.
 type User struct {
 	id        UserID
