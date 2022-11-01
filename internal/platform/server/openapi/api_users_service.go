@@ -49,7 +49,12 @@ func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResp
 func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error) {
 	all, err := s.findAllService.FindAll(ctx)
 	if err != nil {
-		return Response(http.StatusInternalServerError, nil), err
+		switch {
+		case errors.Is(err, users.ErrNotFound):
+			return Response(http.StatusNotFound, nil), err
+		default:
+			return Response(http.StatusInternalServerError, nil), err
+		}
 	}
 
 	return Response(http.StatusOK, UsersToUserDtos(all)), nil
