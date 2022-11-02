@@ -7,6 +7,8 @@ import (
 	"errors"
 )
 
+//go:generate mockery --case=snake --outpkg=mocks --output=../mocks --name=FindAllUsersUseCase
+
 type FindAllUsersUseCase interface {
 	FindAll(ctx context.Context) ([]users.User, error)
 }

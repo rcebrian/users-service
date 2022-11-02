@@ -13,13 +13,13 @@ import (
 // This users should implement the business logic for every endpoint for the UsersApi API.
 // Include any external packages or services that will be required by these users.
 type UsersApiService struct {
-	creatingService creating.CreateUserService
+	creatingService creating.CreateUserUseCase
 	findAllService  finding.FindAllUsersUseCase
 	findByIdService finding.FindUserByIdUseCase
 }
 
 // NewUsersApiService creates a default api users
-func NewUsersApiService(creatingService creating.CreateUserService, findAllService finding.FindAllUsersUseCase, findByIdService finding.FindUserByIdUseCase) UsersApiServicer {
+func NewUsersApiService(creatingService creating.CreateUserUseCase, findAllService finding.FindAllUsersUseCase, findByIdService finding.FindUserByIdUseCase) UsersApiServicer {
 	return &UsersApiService{
 		creatingService: creatingService,
 		findAllService:  findAllService,
@@ -36,7 +36,7 @@ func (s *UsersApiService) CreateUser(ctx context.Context, dto UserDto) (ImplResp
 		case errors.Is(err, users.ErrInvalidUserID),
 			errors.Is(err, users.ErrEmptyUserName),
 			errors.Is(err, users.ErrEmptyFirstname):
-			return Response(http.StatusNotFound, nil), err
+			return Response(http.StatusBadRequest, nil), err
 		default:
 			return Response(http.StatusInternalServerError, nil), err
 		}

@@ -8,7 +8,9 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateUserService interface {
+//go:generate mockery --case=snake --outpkg=mocks --output=../mocks --name=CreateUserUseCase
+
+type CreateUserUseCase interface {
 	Create(ctx context.Context, name, firstname string) error
 }
 
@@ -16,7 +18,7 @@ type createUserUseCase struct {
 	repository users.UserRepository
 }
 
-func NewCreatingService(repository users.UserRepository) CreateUserService {
+func NewCreatingService(repository users.UserRepository) CreateUserUseCase {
 	return createUserUseCase{repository: repository}
 }
 
