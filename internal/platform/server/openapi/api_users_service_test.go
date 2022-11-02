@@ -14,6 +14,48 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
+	dtoInput := UserDto{Name: "John", Firstname: "Doe"}
+	tests := []struct {
+		name        string
+		want        ImplResponse
+		expectedErr error
+	}{
+		{
+			name:        "error invalid user ID",
+			want:        ImplResponse{Code: 400},
+			expectedErr: users.ErrInvalidUserID,
+		},
+		{
+			name:        "error invalid user name",
+			want:        ImplResponse{Code: 400},
+			expectedErr: users.ErrEmptyUserName,
+		},
+		{
+			name:        "error invalid user first name",
+			want:        ImplResponse{Code: 400},
+			expectedErr: users.ErrEmptyFirstname,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createServiceMock := new(mocks.CreateUserUseCase)
+			findAllServiceMock := new(mocks.FindAllUsersUseCase)
+			findByIdServiceMock := new(mocks.FindUserByIdUseCase)
+
+			apiService := NewUsersApiService(createServiceMock, findAllServiceMock, findByIdServiceMock)
+
+			createServiceMock.On("Create", mock.Anything, dtoInput.Name, dtoInput.Firstname).
+				Return(tt.expectedErr)
+
+			_, err := apiService.CreateUser(context.Background(), dtoInput)
+
+			assert.ErrorIs(t, err, tt.expectedErr)
+		})
+	}
+}
+
 func Test_UsersApiService_CreateUser_BadRequestError(t *testing.T) {
 	createServiceMock := new(mocks.CreateUserUseCase)
 	findAllServiceMock := new(mocks.FindAllUsersUseCase)
