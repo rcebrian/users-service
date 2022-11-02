@@ -15,7 +15,6 @@ import (
 )
 
 func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
-	dtoInput := UserDto{Name: "John", Firstname: "Doe"}
 	tests := []struct {
 		name        string
 		dtoInput    UserDto
@@ -50,10 +49,10 @@ func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
 
 			apiService := NewUsersApiService(createServiceMock, findAllServiceMock, findByIdServiceMock)
 
-			createServiceMock.On("Create", mock.Anything, dtoInput.Name, dtoInput.Firstname).
+			createServiceMock.On("Create", mock.Anything, tt.dtoInput.Name, tt.dtoInput.Firstname).
 				Return(tt.expectedErr)
 
-			_, err := apiService.CreateUser(context.Background(), dtoInput)
+			_, err := apiService.CreateUser(context.Background(), tt.dtoInput)
 
 			assert.ErrorIs(t, err, tt.expectedErr)
 		})
