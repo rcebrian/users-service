@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
+func Test_UsersApiService_CreateUser_BadRequestError(t *testing.T) {
 	tests := []struct {
 		name        string
 		dtoInput    UserDto
@@ -52,31 +52,12 @@ func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
 			createServiceMock.On("Create", mock.Anything, tt.dtoInput.Name, tt.dtoInput.Firstname).
 				Return(tt.expectedErr)
 
-			_, err := apiService.CreateUser(context.Background(), tt.dtoInput)
+			res, err := apiService.CreateUser(context.Background(), tt.dtoInput)
 
+			assert.Equal(t, res.Code, http.StatusBadRequest)
 			assert.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
-}
-
-func Test_UsersApiService_CreateUser_BadRequestError(t *testing.T) {
-	createServiceMock := new(mocks.CreateUserUseCase)
-	findAllServiceMock := new(mocks.FindAllUsersUseCase)
-	findByIdServiceMock := new(mocks.FindUserByIdUseCase)
-
-	userName, userFirstname := "John", "Doe"
-
-	createServiceMock.On("Create", mock.Anything, userName, userFirstname).
-		Return(users.ErrInvalidUserID)
-
-	dtoInput := UserDto{Name: userName, Firstname: userFirstname}
-
-	apiService := NewUsersApiService(createServiceMock, findAllServiceMock, findByIdServiceMock)
-
-	res, err := apiService.CreateUser(context.Background(), dtoInput)
-
-	assert.Equal(t, res.Code, http.StatusBadRequest)
-	assert.ErrorIs(t, err, users.ErrInvalidUserID)
 }
 
 func Test_UsersApiService_CreateUser_InternalServerError(t *testing.T) {
