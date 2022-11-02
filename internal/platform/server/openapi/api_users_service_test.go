@@ -18,21 +18,25 @@ func TestUsersApiService_CreateUser_BadRequestError(t *testing.T) {
 	dtoInput := UserDto{Name: "John", Firstname: "Doe"}
 	tests := []struct {
 		name        string
+		dtoInput    UserDto
 		want        ImplResponse
 		expectedErr error
 	}{
 		{
 			name:        "error invalid user ID",
+			dtoInput:    UserDto{Name: "John", Firstname: "Doe"},
 			want:        ImplResponse{Code: 400},
 			expectedErr: users.ErrInvalidUserID,
 		},
 		{
-			name:        "error invalid user name",
+			name:        "error empty user name",
+			dtoInput:    UserDto{Name: "", Firstname: "Doe"},
 			want:        ImplResponse{Code: 400},
 			expectedErr: users.ErrEmptyUserName,
 		},
 		{
-			name:        "error invalid user first name",
+			name:        "error empty user firstname",
+			dtoInput:    UserDto{Name: "John", Firstname: ""},
 			want:        ImplResponse{Code: 400},
 			expectedErr: users.ErrEmptyFirstname,
 		},
