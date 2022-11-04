@@ -13,11 +13,21 @@ api:
 	scripts/api/codegen.sh
 
 api-clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go' -delete
+	find internal/platform/server/openapi -type f -not -name '*_service.go' -and ! -name '*mapper*.go' -delete
 
 lint:
+	goimports -w .
 	golangci-lint run
 
 clean: build-clean api-clean
 
 all: clean api build
+
+test:
+	go test ./...
+
+test-coverage:
+	go test ./... -cover
+
+test-coverage-reporter:
+	scripts/test/reporter.sh
