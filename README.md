@@ -89,39 +89,19 @@ To get a local copy up and running follow these simple example steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 
-* npm
+* openapi-generator-cli (npm based)
   ```sh
-  npm install npm@latest -g
+  npm install -g @openapitools/openapi-generator-cli@2.5.2
   ```
 
 ### Installation
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/rcebrian/go-api-template.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- USAGE EXAMPLES -->
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos
-work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+Check ```Makefile``` targets
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -135,9 +115,9 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Graceful shutdown
 - [x] Makefile based
 - [x] Git hooks
-- [ ] Internal endpoints
+- [x] Internal endpoints
     - [x] Healthcheck
-    - [ ] ReDoc
+    - [x] ReDoc
 - [ ] Prometheus metrics
 
 See the [open issues](https://github.com/rcebrian/go-api-template/issues) for a full list of proposed features (and
