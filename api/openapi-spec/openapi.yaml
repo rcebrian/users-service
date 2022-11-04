@@ -52,6 +52,13 @@ paths:
           description: Created
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
         '500':
           description: Internal Server Error
       description: Save user into data storage
@@ -82,9 +89,7 @@ paths:
       description: Retrieve user information from ID
     parameters:
       - schema:
-          type: integer
-          exclusiveMinimum: true
-          minimum: 0
+          type: string
         name: userId
         in: path
         required: true
@@ -93,13 +98,11 @@ components:
   schemas:
     User:
       title: User
-      x-stoplight:
-        id: e04lplqp2mw1t
       type: object
       description: ''
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         firstname:
@@ -107,3 +110,4 @@ components:
       required:
         - name
         - firstname
+  responses: {}

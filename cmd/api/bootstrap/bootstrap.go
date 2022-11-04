@@ -2,16 +2,18 @@ package bootstrap
 
 import (
 	"api-template/config"
+	users "api-template/internal"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
-	"api-template/internal/platform/storage/memory"
+	"api-template/internal/users/creating"
+	"api-template/internal/users/finding"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/mvrilo/go-redoc"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/mvrilo/go-redoc"
 )
 
 // RunInternalServer starts a server for healthcheck status
@@ -35,11 +37,11 @@ func RunInternalServer() error {
 }
 
 // NewServer create a new configured server
-func NewServer() *http.Server {
+func NewServer(userRepo users.UserRepository) *http.Server {
 	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
 
 	// users
-	UsersApiController := usersApiController()
+	UsersApiController := usersApiController(userRepo)
 
 	router := server.NewRouter(UsersApiController)
 
@@ -54,10 +56,12 @@ func NewServer() *http.Server {
 }
 
 // usersApiController configure users controller with dependency injection
-func usersApiController() server.Router {
-	userRepo := memory.NewUserRepository()
+func usersApiController(userRepo users.UserRepository) server.Router {
+	createService := creating.NewCreatingService(userRepo)
+	findAllService := finding.NewFindAllUsersUseCase(userRepo)
+	findByIdService := finding.NewFindUserByIdUseCase(userRepo)
 
-	UsersApiService := server.NewUsersApiService(userRepo)
+	UsersApiService := server.NewUsersApiService(createService, findAllService, findByIdService)
 
 	return server.NewUsersApiController(UsersApiService)
 }
