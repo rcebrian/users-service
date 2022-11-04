@@ -2,7 +2,7 @@ SHELL = /bin/bash
 MAKEFLAGS += --silent
 
 .PHONY: build
-build:
+build: api-clean api
 	go build -o ./build/api ./cmd/api/main.go
 
 build-clean:
@@ -13,7 +13,8 @@ api:
 	scripts/api/codegen.sh
 
 api-clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go' -and ! -name '*mapper*.go' -delete
+	find internal/platform/server/openapi -type f -not -name '*_service.go'  -and ! -name '*_service_test.go' \
+		-and ! -name '*mapper*.go' -delete
 
 lint:
 	goimports -w .
