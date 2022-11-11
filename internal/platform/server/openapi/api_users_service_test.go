@@ -152,7 +152,7 @@ func Test_UsersApiService_GetAllUsers_Ok(t *testing.T) {
 	res, err := apiService.GetAllUsers(context.Background())
 
 	assert.Equal(t, res.Code, http.StatusOK)
-	assert.IsType(t, res.Body, []UserDto{})
+	assert.IsType(t, res.Body, GetAllUsers200Response{})
 	assert.Nil(t, err)
 }
 

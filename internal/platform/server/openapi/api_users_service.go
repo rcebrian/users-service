@@ -57,7 +57,9 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 		}
 	}
 
-	return Response(http.StatusOK, UsersToUserDtos(all)), nil
+	resBody := GetAllUsers200Response{Users: UsersToUserDtos(all)}
+
+	return Response(http.StatusOK, resBody), nil
 }
 
 // GetUserById - Get user by id
