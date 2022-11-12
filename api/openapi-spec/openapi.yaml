@@ -41,9 +41,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserDto'
     post:
       summary: Create user
       operationId: createUser
@@ -66,7 +69,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserDto'
       tags:
         - users
   '/users/{userId}':
@@ -80,7 +83,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserDto'
         '404':
           description: Not Found
         '500':
@@ -96,10 +99,10 @@ paths:
         description: Numeric ID of the user to get
 components:
   schemas:
-    User:
-      title: User
+    UserDto:
+      title: UserDto
       type: object
-      description: ''
+      description: 'User model for API operations'
       properties:
         id:
           type: string
@@ -107,7 +110,3 @@ components:
           type: string
         firstname:
           type: string
-      required:
-        - name
-        - firstname
-  responses: {}

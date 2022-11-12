@@ -18,7 +18,6 @@ openapi-generator-cli generate --generator-name go-server \
   --template-dir $TEMPLATE_DIR --engine $TEMPLATE_ENGINE \
   --global-property apiDocs=true \
   --global-property verbose=false \
-  --model-name-suffix dto \
   --enable-post-process-file \
   -o $OUTPUT_DIR
 
