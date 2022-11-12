@@ -19,7 +19,7 @@ import (
 )
 
 func init() {
-	if err := envconfig.Process("", &config.AppConfig); err != nil {
+	if err := envconfig.Process("", &config.ServiceConfig); err != nil {
 		logger.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
@@ -31,7 +31,7 @@ func init() {
 		logger.WithError(err).Fatal("DATABASE environment variables could not be processed")
 	}
 
-	if err := logger.ParseLevel(config.AppConfig.LogLevel); err != nil {
+	if err := logger.ParseLevel(config.ServiceConfig.LogLevel); err != nil {
 		logger.WithError(err).Fatal("error parsing log level")
 	}
 
@@ -41,7 +41,7 @@ func init() {
 
 	// starts the internal service with private endpoints
 	go func() {
-		logger.Debugf("healthcheck running on :%d/health", config.AppConfig.HttpInternalPort)
+		logger.Debugf("healthcheck running on :%d/health", config.ServiceConfig.HttpInternalPort)
 
 		if err := bootstrap.RunInternalServer(); err != nil {
 			logger.Fatal(err)
@@ -85,6 +85,6 @@ func main() {
 // loadOASpecs loads ServiceID and Version from OpenAPI specs file
 func loadOASpecs() {
 	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
-	config.AppConfig.ServiceID = oa.Info.ServiceID
-	config.AppConfig.ServiceVersion = oa.Info.Version
+	config.ServiceConfig.ServiceID = oa.Info.ServiceID
+	config.ServiceConfig.ServiceVersion = oa.Info.Version
 }

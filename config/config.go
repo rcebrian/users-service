@@ -1,6 +1,6 @@
 package config
 
-var AppConfig ServiceConf
+var ServiceConfig ServiceConf
 
 type ServiceConf struct {
 	ServiceID        string

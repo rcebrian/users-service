@@ -10,8 +10,8 @@ import (
 func GetHealth() *health.Service {
 	return health.New(
 		health.Health{
-			ServiceID: config.AppConfig.ServiceID,
-			Version:   config.AppConfig.ServiceVersion,
+			ServiceID: config.ServiceConfig.ServiceID,
+			Version:   config.ServiceConfig.ServiceVersion,
 		},
 		uptime.System(),
 	)

@@ -18,7 +18,7 @@ import (
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer() error {
-	addr := fmt.Sprintf(":%d", config.AppConfig.HttpInternalPort)
+	addr := fmt.Sprintf(":%d", config.ServiceConfig.HttpInternalPort)
 	internal := mux.NewRouter()
 	internal.HandleFunc("/health", health.GetHealth().Handler)
 
