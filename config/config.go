@@ -22,9 +22,11 @@ type ServerConf struct {
 var MySqlConfig MySqlConf
 
 type MySqlConf struct {
-	Host     string `envconfig:"MYSQL_HOST" default:"localhost"`
-	Port     int    `envconfig:"MYSQL_PORT" default:"3306"`
-	User     string `envconfig:"MYSQL_USER" default:"codely"`
-	Passwd   string `envconfig:"MYSQL_PASSWD" default:"codely"`
-	Database string `envconfig:"MYSQL_DATABASE" default:"codely"`
+	Host      string `envconfig:"MYSQL_HOST" default:"localhost"`
+	Port      int    `envconfig:"MYSQL_PORT" default:"3306"`
+	Timeout   int    `envconfig:"MYSQL_TIMEOUT" default:"10"`
+	Threshold int    `envconfig:"MYSQL_TIMEOUT" default:"30"`
+	User      string `envconfig:"MYSQL_USER" default:"codely"`
+	Passwd    string `envconfig:"MYSQL_PASSWD" default:"codely"`
+	Database  string `envconfig:"MYSQL_DATABASE" default:"codely"`
 }

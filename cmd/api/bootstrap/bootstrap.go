@@ -7,6 +7,7 @@ import (
 	server "api-template/internal/platform/server/openapi"
 	"api-template/internal/users/creating"
 	"api-template/internal/users/finding"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,10 +18,10 @@ import (
 )
 
 // RunInternalServer starts a server for healthcheck status
-func RunInternalServer() error {
+func RunInternalServer(sqlClient *sql.DB) error {
 	addr := fmt.Sprintf(":%d", config.ServiceConfig.HttpInternalPort)
 	internal := mux.NewRouter()
-	internal.HandleFunc("/health", health.GetHealth().Handler)
+	internal.HandleFunc("/health", health.GetHealth(sqlClient).Handler)
 
 	doc := redoc.Redoc{
 		Title:       "API Docs",

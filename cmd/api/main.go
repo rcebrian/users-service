@@ -18,6 +18,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var db *sql.DB
+
 func init() {
 	if err := envconfig.Process("", &config.ServiceConfig); err != nil {
 		logger.WithError(err).Fatal("APP environment variables could not be processed")
@@ -39,20 +41,24 @@ func init() {
 
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 
+	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
+		config.MySqlConfig.User, config.MySqlConfig.Passwd,
+		config.MySqlConfig.Host, config.MySqlConfig.Port,
+		config.MySqlConfig.Database,
+		time.Duration(config.MySqlConfig.Timeout)*time.Second)
+	db, _ = sql.Open("mysql", mysqlURI)
+
 	// starts the internal service with private endpoints
 	go func() {
 		logger.Debugf("healthcheck running on :%d/health", config.ServiceConfig.HttpInternalPort)
 
-		if err := bootstrap.RunInternalServer(); err != nil {
+		if err := bootstrap.RunInternalServer(db); err != nil {
 			logger.Fatal(err)
 		}
 	}()
 }
 
 func main() {
-	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.MySqlConfig.User, config.MySqlConfig.Passwd, config.MySqlConfig.Host, config.MySqlConfig.Port, config.MySqlConfig.Database)
-	db, _ := sql.Open("mysql", mysqlURI)
-
 	userRepo := mysql.NewUserRepository(db)
 
 	var gracefulTime = time.Second * time.Duration(config.ServerConfig.GracefulTime)
