@@ -1,10 +1,11 @@
 package config
 
-var AppConfig AppConf
+var AppConfig ServiceConf
 
-type AppConf struct {
+type ServiceConf struct {
+	ServiceID        string
+	ServiceVersion   string
 	LogLevel         string `envconfig:"LOG_LEVEL" default:"info"`
-	AppVersion       string `envconfig:"APP_VERSION" default:"v1.0.0"`
 	HttpInternalPort int    `envconfig:"HTTP_INTERNAL_PORT" default:"8079"`
 }
 

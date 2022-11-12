@@ -5,6 +5,7 @@ import (
 	"api-template/config"
 	"api-template/internal/platform/storage/mysql"
 	"api-template/pkg/logger"
+	"api-template/pkg/yaml"
 	"context"
 	"database/sql"
 	"fmt"
@@ -19,23 +20,26 @@ import (
 
 func init() {
 	if err := envconfig.Process("", &config.AppConfig); err != nil {
-		logger.Fatal("APP environment variables could not be processed")
+		logger.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
 	if err := envconfig.Process("", &config.ServerConfig); err != nil {
-		logger.Fatal("SERVER environment variables could not be processed")
+		logger.WithError(err).Fatal("SERVER environment variables could not be processed")
 	}
 
 	if err := envconfig.Process("", &config.MySqlConfig); err != nil {
-		logger.Fatal("DATABASE environment variables could not be processed")
+		logger.WithError(err).Fatal("DATABASE environment variables could not be processed")
 	}
 
 	if err := logger.ParseLevel(config.AppConfig.LogLevel); err != nil {
-		logger.Fatal("error parsing log level")
+		logger.WithError(err).Fatal("error parsing log level")
 	}
+
+	loadOASpecs()
 
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 
+	// starts the internal service with private endpoints
 	go func() {
 		logger.Debugf("healthcheck running on :%d/health", config.AppConfig.HttpInternalPort)
 
@@ -76,4 +80,11 @@ func main() {
 
 	logger.Warn("http server closed")
 	os.Exit(0)
+}
+
+// loadOASpecs loads ServiceID and Version from OpenAPI specs file
+func loadOASpecs() {
+	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
+	config.AppConfig.ServiceID = oa.Info.ServiceID
+	config.AppConfig.ServiceVersion = oa.Info.Version
 }
