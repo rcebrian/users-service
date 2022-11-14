@@ -25,7 +25,7 @@ func init() {
 		logger.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
-	if err := envconfig.Process("", &config.ServerConfig); err != nil {
+	if err := envconfig.Process("", &config.HttpServerConfig); err != nil {
 		logger.WithError(err).Fatal("SERVER environment variables could not be processed")
 	}
 
@@ -61,13 +61,13 @@ func init() {
 func main() {
 	userRepo := mysql.NewUserRepository(db)
 
-	var gracefulTime = time.Second * time.Duration(config.ServerConfig.GracefulTime)
+	var gracefulTime = time.Second * time.Duration(config.HttpServerConfig.GracefulTime)
 
 	srv := bootstrap.NewServer(userRepo)
 
 	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
-		logger.Infof("http server starting on port :%d", config.ServerConfig.Port)
+		logger.Infof("http server starting on port :%d", config.HttpServerConfig.Port)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal(err)

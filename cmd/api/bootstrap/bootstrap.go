@@ -39,7 +39,7 @@ func RunInternalServer(sqlClient *sql.DB) error {
 
 // NewServer create a new configured server
 func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
+	addr := fmt.Sprintf(":%d", config.HttpServerConfig.Port)
 
 	// users
 	UsersApiController := usersApiController(userRepo)
@@ -49,9 +49,9 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	return &http.Server{
 		Addr: addr,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(config.ServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(config.ServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(config.ServerConfig.IdleTimeout),
+		WriteTimeout: time.Second * time.Duration(config.HttpServerConfig.WriteTimeout),
+		ReadTimeout:  time.Second * time.Duration(config.HttpServerConfig.ReadTimeout),
+		IdleTimeout:  time.Second * time.Duration(config.HttpServerConfig.IdleTimeout),
 		Handler:      router,
 	}
 }
