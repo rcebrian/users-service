@@ -24,24 +24,38 @@ func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 	defer cancel()
 
 	var checks = health.Checks{
-		ComponentID: m.componentID,
-		Time:        startTime,
+		ComponentID:   m.componentID,
+		Time:          startTime,
+		ComponentType: "datastore",
 	}
 
-	err := m.client.PingContext(ctxTimeout)
+	conn, err := m.client.Conn(ctxTimeout)
 	if err != nil {
 		checks.Output = err.Error()
 		checks.Status = health.Fail
+
+		return map[string][]health.Checks{"mysql:responseTime": {checks}}
+	}
+
+	err = conn.PingContext(ctxTimeout)
+	_ = conn.Close()
+
+	if err != nil {
+		checks.Output = err.Error()
+		checks.Status = health.Fail
+
+		return map[string][]health.Checks{"mysql:responseTime": {checks}}
+	}
+
+	end := time.Now().Local()
+	responseTime := end.Sub(start)
+	checks.ObservedValue = responseTime.Nanoseconds()
+	checks.ObservedUnit = "ns"
+
+	if responseTime > m.threshold {
+		checks.Status = health.Warn
 	} else {
-		end := time.Now().Local()
-		responseTime := end.Sub(start)
-		checks.ObservedValue = responseTime.Nanoseconds()
-		checks.ObservedUnit = "ns"
-		if responseTime > m.threshold {
-			checks.Status = health.Warn
-		} else {
-			checks.Status = health.Pass
-		}
+		checks.Status = health.Pass
 	}
 
 	return map[string][]health.Checks{"mysql:responseTime": {checks}}
