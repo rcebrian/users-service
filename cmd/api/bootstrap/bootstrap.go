@@ -7,6 +7,7 @@ import (
 	server "api-template/internal/platform/server/openapi"
 	"api-template/internal/users/creating"
 	"api-template/internal/users/finding"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,10 +18,10 @@ import (
 )
 
 // RunInternalServer starts a server for healthcheck status
-func RunInternalServer() error {
-	addr := fmt.Sprintf(":%d", config.AppConfig.HttpInternalPort)
+func RunInternalServer(sqlClient *sql.DB) error {
+	addr := fmt.Sprintf(":%d", config.ServiceConfig.HttpInternalPort)
 	internal := mux.NewRouter()
-	internal.HandleFunc("/health", health.GetHealth().Handler)
+	internal.HandleFunc("/health", health.GetHealth(sqlClient).Handler)
 
 	doc := redoc.Redoc{
 		Title:       "API Docs",
@@ -38,7 +39,7 @@ func RunInternalServer() error {
 
 // NewServer create a new configured server
 func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
+	addr := fmt.Sprintf(":%d", config.HttpServerConfig.Port)
 
 	// users
 	UsersApiController := usersApiController(userRepo)
@@ -48,9 +49,9 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	return &http.Server{
 		Addr: addr,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(config.ServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(config.ServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(config.ServerConfig.IdleTimeout),
+		WriteTimeout: time.Second * time.Duration(config.HttpServerConfig.WriteTimeout),
+		ReadTimeout:  time.Second * time.Duration(config.HttpServerConfig.ReadTimeout),
+		IdleTimeout:  time.Second * time.Duration(config.HttpServerConfig.IdleTimeout),
 		Handler:      router,
 	}
 }

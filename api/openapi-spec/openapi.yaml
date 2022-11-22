@@ -1,16 +1,17 @@
 openapi: 3.0.3
 info:
-  description: Basic API template
-  version: 1.0.0
-  title: Basic API
+  title: Users API
+  description: Users basic CRUD (create, read, update and delete)
+  version: v1.0.0
+  x-service: users-service
   contact:
-    email: apiteam@swagger.io
+    email: rcebrian@github.com
   license:
-    name: Apache 2.0
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: MIT
+    url: 'https://www.mit.edu/~amini/LICENSE.md'
 servers:
   - url: 'http://localhost:8080'
-    description: localhost
+    description: localhost environment
 tags:
   - name: system
     description: System health operations
