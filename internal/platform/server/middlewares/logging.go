@@ -1,4 +1,4 @@
-package logging
+package middlewares
 
 import (
 	"api-template/pkg/logger"
@@ -16,7 +16,7 @@ func (r *StatusRecorder) WriteHeader(status int) {
 	r.ResponseWriter.WriteHeader(status)
 }
 
-func Middleware(inner http.Handler) http.Handler {
+func Logging(inner http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
