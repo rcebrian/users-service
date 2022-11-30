@@ -16,11 +16,12 @@ func (r *StatusRecorder) WriteHeader(status int) {
 	r.ResponseWriter.WriteHeader(status)
 }
 
-func Logging(inner http.Handler) http.Handler {
+// Logging middleware that logs all requests
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
-		inner.ServeHTTP(recorder, r)
+		next.ServeHTTP(recorder, r)
 		logger.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
 			r.RemoteAddr,
 			r.Method, r.RequestURI, r.Proto,
