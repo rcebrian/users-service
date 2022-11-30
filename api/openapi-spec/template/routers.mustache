@@ -8,9 +8,6 @@ import (
 	{{#mux}}
 	"github.com/gorilla/mux"
 	"api-template/internal/platform/server/middlewares"
-	{{#featureCORS}}
-	"github.com/gorilla/handlers"
-	{{/featureCORS}}
 	{{/mux}}
 	{{#chi}}
 	"github.com/go-chi/chi/v5"
@@ -66,10 +63,11 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 			handler = route.HandlerFunc
 {{#routers}}
 	{{#mux}}
-			handler = middlewares.Logging(handler)
 			{{#featureCORS}}
-			handler = handlers.CORS()(handler)
+			handler = middlewares.Cors(handler)
 			{{/featureCORS}}
+			handler = middlewares.PanicRecovery(handler)
+			handler = middlewares.Logging(handler)
 
 			router.
 				Methods(route.Method).
