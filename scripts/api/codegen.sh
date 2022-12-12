@@ -20,6 +20,6 @@ openapi-generator-cli generate --generator-name go-server \
   -p outputAsLibrary=true,addResponseHeaders=true,sourceFolder=openapi,packageName=server,serverPort=8080 \
   -o $OUTPUT_DIR
 
-
-# bug: remove empty dir
-rmdir $OUTPUT_DIR/api
+if [ $? -eq 0 ]; then
+  rm -r ${OUTPUT_DIR}/{.openapi-generator,api}
+fi
