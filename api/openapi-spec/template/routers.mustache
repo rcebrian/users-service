@@ -55,7 +55,6 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 
 	router.Use(middlewares.middlewares.PanicRecovery)
 	router.Use(middlewares.Logging)
-
 	{{#featureCORS}}
 	router.Use(middlewares.Cors)
 	{{/featureCORS}}
@@ -67,9 +66,9 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 			handler = route.HandlerFunc
 {{#routers}}
 	{{#mux}}
+
 			handler = middlewares.PanicRecovery(handler)
 			handler = middlewares.Logging(handler)
-
 			{{#featureCORS}}
 			handler = middlewares.Cors(handler)
 			{{/featureCORS}}
