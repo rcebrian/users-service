@@ -1,7 +1,7 @@
 package mysql
 
 const (
-	sqlUserTable = "users"
+	sqlUserTable = "user"
 )
 
 type sqlUser struct {
