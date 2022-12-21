@@ -39,7 +39,6 @@ func Test_Middleware_PanicRecovery_Ok(t *testing.T) {
 	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(nil)
-		return
 	})
 
 	mux.Handle("/", PanicRecovery(nextHandler))
