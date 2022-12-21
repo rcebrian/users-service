@@ -5,7 +5,7 @@ import (
 	"api-template/pkg/logger"
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	logger.SetOutput(ioutil.Discard)
+	logger.SetOutput(io.Discard)
 }
 
 func Test_UserRepository_Save_RepositoryError(t *testing.T) {

@@ -1,7 +1,7 @@
 package yaml
 
 import (
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
@@ -17,7 +17,7 @@ type OpenAPI struct {
 
 // ReadOpenAPI reads an openapi file in yaml format and return as OpenAPI struct
 func ReadOpenAPI(path string) (OpenAPI, error) {
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		return OpenAPI{}, err
 	}
