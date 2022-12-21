@@ -17,7 +17,7 @@ openapi-generator-cli generate --generator-name go-server \
   --global-property apiDocs=true \
   --global-property verbose=false \
   --enable-post-process-file \
-  -p addResponseHeaders=true,featureCORS=true,serverPort=8080,sourceFolder=openapi,packageName=server,outputAsLibrary=true \
+  -p router=chi,addResponseHeaders=true,featureCORS=true,serverPort=8080,sourceFolder=openapi,packageName=server,outputAsLibrary=true \
   -o $OUTPUT_DIR
 
 if [ $? -eq 0 ]; then
