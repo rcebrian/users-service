@@ -13,14 +13,13 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
 	"github.com/mvrilo/go-redoc"
 )
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer(sqlClient *sql.DB) error {
 	addr := fmt.Sprintf(":%d", config.ServiceConfig.HttpInternalPort)
-	internal := mux.NewRouter()
+	internal := http.NewServeMux()
 	internal.HandleFunc("/health", health.GetHealth(sqlClient).Handler)
 
 	doc := redoc.Redoc{
