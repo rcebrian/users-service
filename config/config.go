@@ -26,7 +26,7 @@ type MySqlConf struct {
 	Port      int    `envconfig:"MYSQL_PORT" default:"3306"`
 	Timeout   int    `envconfig:"MYSQL_TIMEOUT" default:"10"`
 	Threshold int    `envconfig:"MYSQL_TIMEOUT" default:"30"`
-	User      string `envconfig:"MYSQL_USER" default:"codely"`
-	Passwd    string `envconfig:"MYSQL_PASSWD" default:"codely"`
-	Database  string `envconfig:"MYSQL_DATABASE" default:"codely"`
+	User      string `envconfig:"MYSQL_USER" default:"srvuser"`
+	Passwd    string `envconfig:"MYSQL_PASSWD" default:"srvuser"`
+	Database  string `envconfig:"MYSQL_DATABASE" default:"users"`
 }
