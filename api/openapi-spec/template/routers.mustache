@@ -53,7 +53,7 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 	{{#chi}}
 	router := chi.NewRouter()
 
-	router.Use(middlewares.middlewares.PanicRecovery)
+	router.Use(middlewares.PanicRecovery)
 	router.Use(middlewares.Logging)
 	{{#featureCORS}}
 	router.Use(middlewares.Cors)
