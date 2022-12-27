@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: users-database
+    image: mysql:8.0.31
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: users
+      MYSQL_USER: srvuser
+      MYSQL_PASSWORD: srvuser
+      MYSQL_ROOT_PASSWORD: srvuser

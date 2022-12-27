@@ -1,26 +1,26 @@
 package bootstrap
 
 import (
-	"api-template/config"
-	users "api-template/internal"
-	"api-template/internal/platform/server/handler/health"
-	server "api-template/internal/platform/server/openapi"
-	"api-template/internal/users/creating"
-	"api-template/internal/users/finding"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
+	"github.com/rcebrian/users-service/configs"
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/platform/server/handler/health"
+	server "github.com/rcebrian/users-service/internal/platform/server/openapi"
+	"github.com/rcebrian/users-service/internal/users/creating"
+	"github.com/rcebrian/users-service/internal/users/finding"
+
 	"github.com/mvrilo/go-redoc"
 )
 
 // RunInternalServer starts a server for healthcheck status
-func RunInternalServer() error {
-	addr := fmt.Sprintf(":%d", config.AppConfig.HttpInternalPort)
-	internal := mux.NewRouter()
-	internal.HandleFunc("/health", health.GetHealth().Handler)
+func RunInternalServer(sqlClient *sql.DB) error {
+	addr := fmt.Sprintf(":%d", configs.ServiceConfig.HttpInternalPort)
+	internal := http.NewServeMux()
+	internal.HandleFunc("/health", health.GetHealth(sqlClient).Handler)
 
 	doc := redoc.Redoc{
 		Title:       "API Docs",
@@ -38,7 +38,7 @@ func RunInternalServer() error {
 
 // NewServer create a new configured server
 func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", config.ServerConfig.Port)
+	addr := fmt.Sprintf(":%d", configs.HttpServerConfig.Port)
 
 	// users
 	UsersApiController := usersApiController(userRepo)
@@ -48,9 +48,9 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	return &http.Server{
 		Addr: addr,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(config.ServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(config.ServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(config.ServerConfig.IdleTimeout),
+		WriteTimeout: time.Second * time.Duration(configs.HttpServerConfig.WriteTimeout),
+		ReadTimeout:  time.Second * time.Duration(configs.HttpServerConfig.ReadTimeout),
+		IdleTimeout:  time.Second * time.Duration(configs.HttpServerConfig.IdleTimeout),
 		Handler:      router,
 	}
 }

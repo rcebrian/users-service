@@ -1,7 +1,7 @@
 package server
 
 import (
-	users "api-template/internal"
+	users "github.com/rcebrian/users-service/internal"
 )
 
 // UserToUserDto maps a users.User to a server.UserDto

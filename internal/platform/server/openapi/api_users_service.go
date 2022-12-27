@@ -1,12 +1,13 @@
 package server
 
 import (
-	users "api-template/internal"
-	"api-template/internal/users/creating"
-	"api-template/internal/users/finding"
 	"context"
 	"errors"
 	"net/http"
+
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/users/creating"
+	"github.com/rcebrian/users-service/internal/users/finding"
 )
 
 // UsersApiService is a users that implements the logic for the UsersApiServicer
@@ -57,7 +58,9 @@ func (s *UsersApiService) GetAllUsers(ctx context.Context) (ImplResponse, error)
 		}
 	}
 
-	return Response(http.StatusOK, UsersToUserDtos(all)), nil
+	resBody := GetAllUsers200Response{Users: UsersToUserDtos(all)}
+
+	return Response(http.StatusOK, resBody), nil
 }
 
 // GetUserById - Get user by id

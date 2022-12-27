@@ -1,10 +1,12 @@
 package mysql
 
 import (
-	users "api-template/internal"
-	"api-template/pkg/logger"
 	"context"
 	"database/sql"
+
+	users "github.com/rcebrian/users-service/internal"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/huandu/go-sqlbuilder"
 )
@@ -43,7 +45,7 @@ func (r *UserRepository) Save(ctx context.Context, user users.User) error {
 func (r *UserRepository) FindById(ctx context.Context, id string) (user users.User, err error) {
 	var dbUser sqlUser
 
-	err = r.db.QueryRow("SELECT * FROM users WHERE id = ?  LIMIT 1", id).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname)
+	err = r.db.QueryRow("SELECT * FROM user WHERE id = ?  LIMIT 1", id).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname)
 	if err != nil {
 		return users.User{}, err
 	}
@@ -58,7 +60,7 @@ func (r *UserRepository) FindById(ctx context.Context, id string) (user users.Us
 
 // FindAll get all users.User from persistence
 func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
-	rows, err := r.db.Query("SELECT * FROM users")
+	rows, err := r.db.Query("SELECT * FROM user")
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +71,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
 	defer rows.Close()
 	for rows.Next() { //nolint:wsl
 		if err = rows.Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname); err != nil {
-			logger.WithError(err).Error("error querying user")
+			logrus.WithError(err).Error("error querying user")
 			continue
 		}
 
@@ -82,7 +84,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
 	}
 
 	if err != nil {
-		logger.WithError(err).Error("error closing query")
+		logrus.WithError(err).Error("error closing query")
 	}
 
 	return results, nil

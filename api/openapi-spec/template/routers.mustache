@@ -7,17 +7,9 @@ import (
 {{#routers}}
 	{{#mux}}
 	"github.com/gorilla/mux"
-	"api-template/internal/platform/server/middleware/logging"
-	{{#featureCORS}}
-	"github.com/gorilla/handlers"
-	{{/featureCORS}}
 	{{/mux}}
 	{{#chi}}
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	{{#featureCORS}}
-	"github.com/go-chi/cors"
-	{{/featureCORS}}
 	{{/chi}}
 {{/routers}}
 	"io/ioutil"
@@ -26,6 +18,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/rcebrian/users-service/internal/platform/server/middlewares"
 )
 
 // A Route defines the parameters for an api endpoint
@@ -54,9 +48,11 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 	{{/mux}}
 	{{#chi}}
 	router := chi.NewRouter()
-	router.Use(middleware.Logger)
+
+	router.Use(middlewares.PanicRecovery)
+	router.Use(middlewares.Logging)
 	{{#featureCORS}}
-	router.Use(cors.Handler(cors.Options{}))
+	router.Use(middlewares.Cors)
 	{{/featureCORS}}
 	{{/chi}}
 {{/routers}}
@@ -66,9 +62,11 @@ func NewRouter(routers ...Router) {{#routers}}{{#mux}}*mux.Router{{/mux}}{{#chi}
 			handler = route.HandlerFunc
 {{#routers}}
 	{{#mux}}
-			handler = logging.Middleware(handler)
+
+			handler = middlewares.PanicRecovery(handler)
+			handler = middlewares.Logging(handler)
 			{{#featureCORS}}
-			handler = handlers.CORS()(handler)
+			handler = middlewares.Cors(handler)
 			{{/featureCORS}}
 
 			router.

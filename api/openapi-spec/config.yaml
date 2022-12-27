@@ -1,7 +1,0 @@
-#onlyInterfaces: true
-outputAsLibrary: true
-addResponseHeaders: true
-sourceFolder: openapi
-packageName: server
-serverPort: 8080
-#featureCORS: true

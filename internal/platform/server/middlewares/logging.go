@@ -1,9 +1,10 @@
-package logging
+package middlewares
 
 import (
-	"api-template/pkg/logger"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type StatusRecorder struct {
@@ -16,12 +17,13 @@ func (r *StatusRecorder) WriteHeader(status int) {
 	r.ResponseWriter.WriteHeader(status)
 }
 
-func Middleware(inner http.Handler) http.Handler {
+// Logging middleware that logs all requests
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
-		inner.ServeHTTP(recorder, r)
-		logger.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
+		next.ServeHTTP(recorder, r)
+		logrus.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
 			r.RemoteAddr,
 			r.Method, r.RequestURI, r.Proto,
 			recorder.Status,

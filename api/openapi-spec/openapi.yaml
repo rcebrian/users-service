@@ -1,16 +1,17 @@
 openapi: 3.0.3
 info:
-  description: Basic API template
-  version: 1.0.0
-  title: Basic API
+  title: Users API
+  description: Users basic CRUD (create, read, update and delete)
+  version: v1.0.0
+  x-service: users-service
   contact:
-    email: apiteam@swagger.io
+    email: rcebrian@github.com
   license:
-    name: Apache 2.0
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: MIT
+    url: 'https://www.mit.edu/~amini/LICENSE.md'
 servers:
   - url: 'http://localhost:8080'
-    description: localhost
+    description: localhost environment
 tags:
   - name: system
     description: System health operations
@@ -41,9 +42,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserDto'
     post:
       summary: Create user
       operationId: createUser
@@ -66,7 +70,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserDto'
       tags:
         - users
   '/users/{userId}':
@@ -80,7 +84,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserDto'
         '404':
           description: Not Found
         '500':
@@ -96,10 +100,10 @@ paths:
         description: Numeric ID of the user to get
 components:
   schemas:
-    User:
-      title: User
+    UserDto:
+      title: UserDto
       type: object
-      description: ''
+      description: 'User model for API operations'
       properties:
         id:
           type: string
@@ -107,7 +111,3 @@ components:
           type: string
         firstname:
           type: string
-      required:
-        - name
-        - firstname
-  responses: {}
