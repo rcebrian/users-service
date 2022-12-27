@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api-template/cmd/api/bootstrap"
+	"api-template/cmd/users-api-server/bootstrap"
 	"api-template/configs"
 	"api-template/internal/platform/storage/mysql"
 	"api-template/pkg/yaml"

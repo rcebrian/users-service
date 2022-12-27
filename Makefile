@@ -3,10 +3,10 @@ MAKEFLAGS += --silent
 
 .PHONY: build
 build: api-clean api
-	go build -o ./build/api ./cmd/api/main.go
+	go build -o ./build/users-api-server ./cmd/users-api-server/main.go
 
 build-clean:
-	rm -f ./build/*
+	rm -rf ./build/*
 
 .PHONY: api
 api:
