@@ -1,5 +1,0 @@
-#!/bin/sh
-
-make lint
-make build
-make test
