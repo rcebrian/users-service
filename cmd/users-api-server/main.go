@@ -1,10 +1,6 @@
 package main
 
 import (
-	"api-template/cmd/users-api-server/bootstrap"
-	"api-template/configs"
-	"api-template/internal/platform/storage/mysql"
-	"api-template/pkg/yaml"
 	"context"
 	"database/sql"
 	"fmt"
@@ -12,6 +8,11 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
+	"github.com/rcebrian/users-service/configs"
+	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
+	"github.com/rcebrian/users-service/pkg/yaml"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kelseyhightower/envconfig"

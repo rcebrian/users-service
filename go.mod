@@ -1,4 +1,4 @@
-module api-template
+module github.com/rcebrian/users-service
 
 go 1.18
 

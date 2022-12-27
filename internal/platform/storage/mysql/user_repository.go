@@ -1,9 +1,10 @@
 package mysql
 
 import (
-	users "api-template/internal"
 	"context"
 	"database/sql"
+
+	users "github.com/rcebrian/users-service/internal"
 
 	"github.com/sirupsen/logrus"
 

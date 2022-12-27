@@ -1,10 +1,11 @@
 package finding
 
 import (
-	users "api-template/internal"
 	"context"
 	"database/sql"
 	"errors"
+
+	users "github.com/rcebrian/users-service/internal"
 )
 
 //go:generate mockery --case=snake --outpkg=mocks --output=../mocks --name=FindUserByIdUseCase

@@ -1,9 +1,10 @@
 package server
 
 import (
-	users "api-template/internal"
 	"reflect"
 	"testing"
+
+	users "github.com/rcebrian/users-service/internal"
 )
 
 func Test_UserToUserDto(t *testing.T) {

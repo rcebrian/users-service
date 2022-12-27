@@ -3,8 +3,9 @@
 package mocks
 
 import (
-	users "api-template/internal"
 	context "context"
+
+	users "github.com/rcebrian/users-service/internal"
 
 	mock "github.com/stretchr/testify/mock"
 )

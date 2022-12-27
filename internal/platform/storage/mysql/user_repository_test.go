@@ -1,11 +1,12 @@
 package mysql
 
 import (
-	users "api-template/internal"
 	"context"
 	"errors"
 	"io"
 	"testing"
+
+	users "github.com/rcebrian/users-service/internal"
 
 	"github.com/sirupsen/logrus"
 

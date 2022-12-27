@@ -1,12 +1,13 @@
 package server
 
 import (
-	users "api-template/internal"
-	"api-template/internal/users/creating"
-	"api-template/internal/users/finding"
 	"context"
 	"errors"
 	"net/http"
+
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/users/creating"
+	"github.com/rcebrian/users-service/internal/users/finding"
 )
 
 // UsersApiService is a users that implements the logic for the UsersApiServicer

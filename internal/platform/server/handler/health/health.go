@@ -1,9 +1,10 @@
 package health
 
 import (
-	"api-template/configs"
-	"api-template/internal/platform/storage/mysql"
 	"database/sql"
+
+	"github.com/rcebrian/users-service/configs"
+	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
 
 	"github.com/nelkinda/health-go"
 	"github.com/nelkinda/health-go/checks/uptime"

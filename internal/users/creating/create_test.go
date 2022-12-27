@@ -1,11 +1,12 @@
 package creating
 
 import (
-	users "api-template/internal"
-	"api-template/internal/platform/storage/mocks"
 	"context"
 	"errors"
 	"testing"
+
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/platform/storage/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

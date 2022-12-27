@@ -1,16 +1,17 @@
 package bootstrap
 
 import (
-	"api-template/configs"
-	users "api-template/internal"
-	"api-template/internal/platform/server/handler/health"
-	server "api-template/internal/platform/server/openapi"
-	"api-template/internal/users/creating"
-	"api-template/internal/users/finding"
 	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/rcebrian/users-service/configs"
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/platform/server/handler/health"
+	server "github.com/rcebrian/users-service/internal/platform/server/openapi"
+	"github.com/rcebrian/users-service/internal/users/creating"
+	"github.com/rcebrian/users-service/internal/users/finding"
 
 	"github.com/mvrilo/go-redoc"
 )

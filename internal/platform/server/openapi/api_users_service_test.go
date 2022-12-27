@@ -1,12 +1,13 @@
 package server
 
 import (
-	users "api-template/internal"
-	"api-template/internal/users/mocks"
 	"context"
 	"errors"
 	"net/http"
 	"testing"
+
+	users "github.com/rcebrian/users-service/internal"
+	"github.com/rcebrian/users-service/internal/users/mocks"
 
 	"github.com/stretchr/testify/require"
 

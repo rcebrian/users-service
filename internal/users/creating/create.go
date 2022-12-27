@@ -1,8 +1,9 @@
 package creating
 
 import (
-	users "api-template/internal"
 	"context"
+
+	users "github.com/rcebrian/users-service/internal"
 
 	"github.com/sirupsen/logrus"
 
