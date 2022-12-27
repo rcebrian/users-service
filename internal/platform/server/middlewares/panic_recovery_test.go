@@ -1,18 +1,19 @@
 package middlewares
 
 import (
-	"api-template/pkg/logger"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Middleware_PanicRecovery_InternalServerError(t *testing.T) {
-	logger.SetOutput(io.Discard)
+	logrus.SetOutput(io.Discard)
 
 	mux := http.NewServeMux()
 	nextHandler := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {

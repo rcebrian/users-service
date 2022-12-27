@@ -2,9 +2,10 @@ package mysql
 
 import (
 	users "api-template/internal"
-	"api-template/pkg/logger"
 	"context"
 	"database/sql"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/huandu/go-sqlbuilder"
 )
@@ -69,7 +70,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
 	defer rows.Close()
 	for rows.Next() { //nolint:wsl
 		if err = rows.Scan(&dbUser.ID, &dbUser.Name, &dbUser.Firstname); err != nil {
-			logger.WithError(err).Error("error querying user")
+			logrus.WithError(err).Error("error querying user")
 			continue
 		}
 
@@ -82,7 +83,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]users.User, error) {
 	}
 
 	if err != nil {
-		logger.WithError(err).Error("error closing query")
+		logrus.WithError(err).Error("error closing query")
 	}
 
 	return results, nil

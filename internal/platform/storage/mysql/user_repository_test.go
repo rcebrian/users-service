@@ -2,11 +2,12 @@ package mysql
 
 import (
 	users "api-template/internal"
-	"api-template/pkg/logger"
 	"context"
 	"errors"
 	"io"
 	"testing"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,7 @@ import (
 )
 
 func init() {
-	logger.SetOutput(io.Discard)
+	logrus.SetOutput(io.Discard)
 }
 
 func Test_UserRepository_Save_RepositoryError(t *testing.T) {

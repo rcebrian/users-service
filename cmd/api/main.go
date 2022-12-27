@@ -4,7 +4,6 @@ import (
 	"api-template/cmd/api/bootstrap"
 	"api-template/config"
 	"api-template/internal/platform/storage/mysql"
-	"api-template/pkg/logger"
 	"api-template/pkg/yaml"
 	"context"
 	"database/sql"
@@ -21,21 +20,28 @@ import (
 var db *sql.DB
 
 func init() {
-	if err := envconfig.Process("", &config.ServiceConfig); err != nil {
-		logger.WithError(err).Fatal("APP environment variables could not be processed")
+	var (
+		err   error
+		level logrus.Level
+	)
+
+	if err = envconfig.Process("", &config.ServiceConfig); err != nil {
+		logrus.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
-	if err := envconfig.Process("", &config.HttpServerConfig); err != nil {
-		logger.WithError(err).Fatal("SERVER environment variables could not be processed")
+	if err = envconfig.Process("", &config.HttpServerConfig); err != nil {
+		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
 	}
 
-	if err := envconfig.Process("", &config.MySqlConfig); err != nil {
-		logger.WithError(err).Fatal("DATABASE environment variables could not be processed")
+	if err = envconfig.Process("", &config.MySqlConfig); err != nil {
+		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
 	}
 
-	if err := logger.ParseLevel(config.ServiceConfig.LogLevel); err != nil {
-		logger.WithError(err).Fatal("error parsing log level")
+	if level, err = logrus.ParseLevel(config.ServiceConfig.LogLevel); err != nil {
+		logrus.WithError(err).Fatal("error parsing log level")
 	}
+
+	logrus.SetLevel(level)
 
 	loadOASpecs()
 
@@ -50,10 +56,10 @@ func init() {
 
 	// starts the internal service with private endpoints
 	go func() {
-		logger.Debugf("healthcheck running on :%d/health", config.ServiceConfig.HttpInternalPort)
+		logrus.Debugf("healthcheck running on :%d/health", config.ServiceConfig.HttpInternalPort)
 
 		if err := bootstrap.RunInternalServer(db); err != nil {
-			logger.Fatal(err)
+			logrus.Fatal(err)
 		}
 	}()
 }
@@ -67,10 +73,10 @@ func main() {
 
 	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
-		logger.Infof("http server starting on port :%d", config.HttpServerConfig.Port)
+		logrus.Infof("http server starting on port :%d", config.HttpServerConfig.Port)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatal(err)
+			logrus.Fatal(err)
 		}
 	}()
 
@@ -84,7 +90,7 @@ func main() {
 
 	_ = srv.Shutdown(ctx)
 
-	logger.Warn("http server closed")
+	logrus.Warn("http server closed")
 	os.Exit(0)
 }
 
