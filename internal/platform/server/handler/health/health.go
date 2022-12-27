@@ -1,7 +1,7 @@
 package health
 
 import (
-	"api-template/config"
+	"api-template/configs"
 	"api-template/internal/platform/storage/mysql"
 	"database/sql"
 
@@ -12,10 +12,10 @@ import (
 func GetHealth(client *sql.DB) *health.Service {
 	return health.New(
 		health.Health{
-			ServiceID: config.ServiceConfig.ServiceID,
-			Version:   config.ServiceConfig.ServiceVersion,
+			ServiceID: configs.ServiceConfig.ServiceID,
+			Version:   configs.ServiceConfig.ServiceVersion,
 		},
 		uptime.System(),
-		mysql.Health("mysql", client, config.MySqlConfig.Timeout, config.MySqlConfig.Threshold),
+		mysql.Health("mysql", client, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold),
 	)
 }

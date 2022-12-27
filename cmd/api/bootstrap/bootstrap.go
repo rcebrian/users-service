@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"api-template/config"
+	"api-template/configs"
 	users "api-template/internal"
 	"api-template/internal/platform/server/handler/health"
 	server "api-template/internal/platform/server/openapi"
@@ -18,7 +18,7 @@ import (
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer(sqlClient *sql.DB) error {
-	addr := fmt.Sprintf(":%d", config.ServiceConfig.HttpInternalPort)
+	addr := fmt.Sprintf(":%d", configs.ServiceConfig.HttpInternalPort)
 	internal := http.NewServeMux()
 	internal.HandleFunc("/health", health.GetHealth(sqlClient).Handler)
 
@@ -38,7 +38,7 @@ func RunInternalServer(sqlClient *sql.DB) error {
 
 // NewServer create a new configured server
 func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", config.HttpServerConfig.Port)
+	addr := fmt.Sprintf(":%d", configs.HttpServerConfig.Port)
 
 	// users
 	UsersApiController := usersApiController(userRepo)
@@ -48,9 +48,9 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	return &http.Server{
 		Addr: addr,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(config.HttpServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(config.HttpServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(config.HttpServerConfig.IdleTimeout),
+		WriteTimeout: time.Second * time.Duration(configs.HttpServerConfig.WriteTimeout),
+		ReadTimeout:  time.Second * time.Duration(configs.HttpServerConfig.ReadTimeout),
+		IdleTimeout:  time.Second * time.Duration(configs.HttpServerConfig.IdleTimeout),
 		Handler:      router,
 	}
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"api-template/cmd/api/bootstrap"
-	"api-template/config"
+	"api-template/configs"
 	"api-template/internal/platform/storage/mysql"
 	"api-template/pkg/yaml"
 	"context"
@@ -25,19 +25,19 @@ func init() {
 		level logrus.Level
 	)
 
-	if err = envconfig.Process("", &config.ServiceConfig); err != nil {
+	if err = envconfig.Process("", &configs.ServiceConfig); err != nil {
 		logrus.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
-	if err = envconfig.Process("", &config.HttpServerConfig); err != nil {
+	if err = envconfig.Process("", &configs.HttpServerConfig); err != nil {
 		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
 	}
 
-	if err = envconfig.Process("", &config.MySqlConfig); err != nil {
+	if err = envconfig.Process("", &configs.MySqlConfig); err != nil {
 		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
 	}
 
-	if level, err = logrus.ParseLevel(config.ServiceConfig.LogLevel); err != nil {
+	if level, err = logrus.ParseLevel(configs.ServiceConfig.LogLevel); err != nil {
 		logrus.WithError(err).Fatal("error parsing log level")
 	}
 
@@ -48,15 +48,15 @@ func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 
 	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
-		config.MySqlConfig.User, config.MySqlConfig.Passwd,
-		config.MySqlConfig.Host, config.MySqlConfig.Port,
-		config.MySqlConfig.Database,
-		time.Duration(config.MySqlConfig.Timeout)*time.Second)
+		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
+		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
+		configs.MySqlConfig.Database,
+		time.Duration(configs.MySqlConfig.Timeout)*time.Second)
 	db, _ = sql.Open("mysql", mysqlURI)
 
 	// starts the internal service with private endpoints
 	go func() {
-		logrus.Debugf("healthcheck running on :%d/health", config.ServiceConfig.HttpInternalPort)
+		logrus.Debugf("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
 
 		if err := bootstrap.RunInternalServer(db); err != nil {
 			logrus.Fatal(err)
@@ -67,13 +67,13 @@ func init() {
 func main() {
 	userRepo := mysql.NewUserRepository(db)
 
-	var gracefulTime = time.Second * time.Duration(config.HttpServerConfig.GracefulTime)
+	var gracefulTime = time.Second * time.Duration(configs.HttpServerConfig.GracefulTime)
 
 	srv := bootstrap.NewServer(userRepo)
 
 	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
-		logrus.Infof("http server starting on port :%d", config.HttpServerConfig.Port)
+		logrus.Infof("http server starting on port :%d", configs.HttpServerConfig.Port)
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logrus.Fatal(err)
@@ -97,6 +97,6 @@ func main() {
 // loadOASpecs loads ServiceID and Version from OpenAPI specs file
 func loadOASpecs() {
 	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
-	config.ServiceConfig.ServiceID = oa.Info.ServiceID
-	config.ServiceConfig.ServiceVersion = oa.Info.Version
+	configs.ServiceConfig.ServiceID = oa.Info.ServiceID
+	configs.ServiceConfig.ServiceVersion = oa.Info.Version
 }
