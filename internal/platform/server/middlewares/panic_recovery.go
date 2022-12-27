@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-	"api-template/pkg/logger"
 	"encoding/json"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 type operationResponse struct {
@@ -17,7 +18,7 @@ func PanicRecovery(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				logger.Errorf("panic recover: %+v", err)
+				logrus.Errorf("panic recover: %+v", err)
 
 				body := operationResponse{
 					Code:    http.StatusInternalServerError,

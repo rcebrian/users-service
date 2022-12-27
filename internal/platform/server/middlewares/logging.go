@@ -1,9 +1,10 @@
 package middlewares
 
 import (
-	"api-template/pkg/logger"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type StatusRecorder struct {
@@ -22,7 +23,7 @@ func Logging(next http.Handler) http.Handler {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
 		next.ServeHTTP(recorder, r)
-		logger.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
+		logrus.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
 			r.RemoteAddr,
 			r.Method, r.RequestURI, r.Proto,
 			recorder.Status,

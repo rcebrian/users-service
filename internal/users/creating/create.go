@@ -2,8 +2,9 @@ package creating
 
 import (
 	users "api-template/internal"
-	"api-template/pkg/logger"
 	"context"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/google/uuid"
 )
@@ -27,7 +28,7 @@ func (c createUserUseCase) Create(ctx context.Context, name, firstname string) e
 
 	user, err := users.NewUser(id.String(), name, firstname)
 	if err != nil {
-		logger.WithError(err).Error("persisting user on database")
+		logrus.WithError(err).Error("persisting user on database")
 		return err
 	}
 
