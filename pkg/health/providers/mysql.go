@@ -1,4 +1,4 @@
-package mysql
+package providers
 
 import (
 	"context"
@@ -16,6 +16,15 @@ type mysqldb struct {
 	threshold   time.Duration
 }
 
+// NewMysqlProvider create a new mysql healthcheck
+func NewMysqlProvider(componentID string, client *sql.DB, timeout, threshold int) health.ChecksProvider {
+	tO := time.Duration(timeout) * time.Second
+	tH := time.Duration(threshold) * time.Second
+
+	return &mysqldb{componentID: componentID, client: client, timeout: tO, threshold: tH}
+}
+
+// HealthChecks implements mysql checks
 func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 	start := time.Now().Local()
 	startTime := start.Format(time.RFC3339Nano)
@@ -61,13 +70,7 @@ func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 	return map[string][]health.Checks{"mysql:responseTime": {checks}}
 }
 
-func (m *mysqldb) AuthorizeHealth(r *http.Request) bool {
+// AuthorizeHealth enables auth as default
+func (m *mysqldb) AuthorizeHealth(_ *http.Request) bool {
 	return true
-}
-
-func Health(componentID string, client *sql.DB, timeout, threshold int) health.ChecksProvider {
-	tO := time.Duration(timeout) * time.Second
-	tH := time.Duration(threshold) * time.Second
-
-	return &mysqldb{componentID: componentID, client: client, timeout: tO, threshold: tH}
 }
