@@ -63,7 +63,7 @@ func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 	checks.ObservedValue = responseTime.Nanoseconds()
 	checks.ObservedUnit = "ns"
 
-	if responseTime > m.threshold {
+	if responseTime.Nanoseconds() > m.threshold.Nanoseconds() {
 		checks.Status = health.Warn
 	} else {
 		checks.Status = health.Pass
