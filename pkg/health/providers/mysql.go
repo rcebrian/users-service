@@ -10,19 +10,21 @@ import (
 )
 
 type mysqldb struct {
-	componentID string
-	client      *sql.DB
-	timeout     time.Duration
-	threshold   time.Duration
+	componentID       string
+	affectedEndpoints []string
+	client            *sql.DB
+	timeout           time.Duration
+	threshold         time.Duration
 }
 
 // NewMysqlProvider create a new mysql healthcheck
-func NewMysqlProvider(componentID string, client *sql.DB, timeout, threshold time.Duration) health.ChecksProvider {
+func NewMysqlProvider(componentID string, affectedEndpoints []string, client *sql.DB, timeout, threshold time.Duration) health.ChecksProvider {
 	return &mysqldb{
-		componentID: componentID,
-		client:      client,
-		timeout:     timeout * time.Millisecond,
-		threshold:   threshold * time.Millisecond,
+		componentID:       componentID,
+		affectedEndpoints: affectedEndpoints,
+		client:            client,
+		timeout:           timeout * time.Millisecond,
+		threshold:         threshold * time.Millisecond,
 	}
 }
 
@@ -35,9 +37,10 @@ func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 	defer cancel()
 
 	var checks = health.Checks{
-		ComponentID:   m.componentID,
-		Time:          startTime,
-		ComponentType: "datastore",
+		ComponentID:       m.componentID,
+		Time:              startTime,
+		ComponentType:     "datastore",
+		AffectedEndpoints: m.affectedEndpoints,
 	}
 
 	conn, err := m.client.Conn(ctxTimeout)
@@ -67,6 +70,7 @@ func (m *mysqldb) HealthChecks() map[string][]health.Checks {
 		checks.Status = health.Warn
 	} else {
 		checks.Status = health.Pass
+		checks.AffectedEndpoints = nil
 	}
 
 	return map[string][]health.Checks{"mysql:responseTime": {checks}}

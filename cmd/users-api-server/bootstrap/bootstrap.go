@@ -20,7 +20,9 @@ import (
 
 // RunInternalServer starts a server for healthcheck status
 func RunInternalServer(sqlClient *sql.DB) error {
-	mysqlHealth := providers.NewMysqlProvider("mysql", sqlClient, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
+	mysqlAffectedEndpoints := []string{"/users", "/user"}
+
+	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, sqlClient, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
 	healthService := health.NewHealthService(configs.ServiceConfig.ServiceID, configs.ServiceConfig.ServiceVersion, mysqlHealth)
 
 	addr := fmt.Sprintf(":%d", configs.ServiceConfig.HttpInternalPort)
