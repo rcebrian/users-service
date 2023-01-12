@@ -23,8 +23,8 @@ func NewMysqlProvider(componentID string, affectedEndpoints []string, client *sq
 		componentID:       componentID,
 		affectedEndpoints: affectedEndpoints,
 		client:            client,
-		timeout:           timeout * time.Millisecond,
-		threshold:         threshold * time.Millisecond,
+		timeout:           timeout,
+		threshold:         threshold,
 	}
 }
 

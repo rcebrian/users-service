@@ -13,7 +13,7 @@ import (
 
 var (
 	componentID                     = "test-component"
-	timeout           time.Duration = 5000
+	timeout           time.Duration = 5 * time.Second
 	affectedEndpoints               = []string{"/foo", "/fuu"}
 )
 
@@ -21,7 +21,7 @@ func Test_Mysql_HealthChecks_ShouldPass(t *testing.T) {
 	client, sqlMock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
 	require.NoError(t, err)
 
-	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200)
+	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200*time.Millisecond)
 
 	sqlMock.ExpectPing().WillDelayFor(150 * time.Millisecond)
 
@@ -35,7 +35,7 @@ func Test_Mysql_HealthChecks_ShouldWarn(t *testing.T) {
 	client, sqlMock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
 	require.NoError(t, err)
 
-	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 150)
+	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 150*time.Millisecond)
 
 	sqlMock.ExpectPing().WillDelayFor(200 * time.Millisecond)
 
@@ -51,7 +51,7 @@ func Test_Mysql_HealthChecks_ShouldFail(t *testing.T) {
 	client, sqlMock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
 	require.NoError(t, err)
 
-	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200)
+	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200*time.Millisecond)
 
 	sqlMock.ExpectPing().WillDelayFor(150 * time.Millisecond).WillReturnError(mockErr)
 
@@ -69,7 +69,7 @@ func Test_Mysql_HealthChecks_ShouldFailConnection(t *testing.T) {
 
 	_ = client.Close()
 
-	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200)
+	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, client, timeout, 200*time.Millisecond)
 
 	sqlMock.ExpectPing().WillDelayFor(150 * time.Millisecond)
 
@@ -81,7 +81,7 @@ func Test_Mysql_HealthChecks_ShouldFailConnection(t *testing.T) {
 }
 
 func Test_Mysql_AuthorizeHealth_IsTrue(t *testing.T) {
-	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, nil, timeout, 150)
+	mysqlHealthMock := NewMysqlProvider(componentID, affectedEndpoints, nil, timeout, 150*time.Millisecond)
 
 	got := mysqlHealthMock.AuthorizeHealth(nil)
 
