@@ -17,11 +17,13 @@ type mysqldb struct {
 }
 
 // NewMysqlProvider create a new mysql healthcheck
-func NewMysqlProvider(componentID string, client *sql.DB, timeout, threshold int) health.ChecksProvider {
-	tO := time.Duration(timeout) * time.Second
-	tH := time.Duration(threshold) * time.Second
-
-	return &mysqldb{componentID: componentID, client: client, timeout: tO, threshold: tH}
+func NewMysqlProvider(componentID string, client *sql.DB, timeout, threshold time.Duration) health.ChecksProvider {
+	return &mysqldb{
+		componentID: componentID,
+		client:      client,
+		timeout:     timeout * time.Millisecond,
+		threshold:   threshold * time.Millisecond,
+	}
 }
 
 // HealthChecks implements mysql checks
