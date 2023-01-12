@@ -43,6 +43,7 @@ func Test_Mysql_HealthChecks_ShouldWarn(t *testing.T) {
 	actual := got["mysql:responseTime"][0]
 
 	assert.Equal(t, health.Warn, actual.Status)
+	assert.Equal(t, affectedEndpoints, actual.AffectedEndpoints)
 }
 
 func Test_Mysql_HealthChecks_ShouldFail(t *testing.T) {
@@ -59,6 +60,7 @@ func Test_Mysql_HealthChecks_ShouldFail(t *testing.T) {
 
 	assert.Equal(t, health.Fail, actual.Status)
 	assert.Error(t, mockErr, actual.Output)
+	assert.Equal(t, affectedEndpoints, actual.AffectedEndpoints)
 }
 
 func Test_Mysql_HealthChecks_ShouldFailConnection(t *testing.T) {
@@ -75,6 +77,7 @@ func Test_Mysql_HealthChecks_ShouldFailConnection(t *testing.T) {
 	actual := got["mysql:responseTime"][0]
 
 	assert.Equal(t, health.Fail, actual.Status)
+	assert.Equal(t, affectedEndpoints, actual.AffectedEndpoints)
 }
 
 func Test_Mysql_AuthorizeHealth_IsTrue(t *testing.T) {
