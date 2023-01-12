@@ -8,6 +8,9 @@ build: api-clean api
 build-clean:
 	rm -rf ./build/*
 
+run-server:
+	go run cmd/users-api-server/main.go
+
 .PHONY: api
 api:
 	scripts/api/codegen.sh
