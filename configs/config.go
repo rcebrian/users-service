@@ -26,8 +26,8 @@ var MySqlConfig MySqlConf
 type MySqlConf struct {
 	Host      string        `envconfig:"MYSQL_HOST" default:"localhost"`
 	Port      int           `envconfig:"MYSQL_PORT" default:"3306"`
-	Timeout   time.Duration `envconfig:"MYSQL_TIMEOUT" default:"5000"`
-	Threshold time.Duration `envconfig:"MYSQL_THRESHOLD" default:"500"`
+	Timeout   time.Duration `envconfig:"MYSQL_TIMEOUT" default:"5000ms"`
+	Threshold time.Duration `envconfig:"MYSQL_THRESHOLD" default:"500ms"`
 	User      string        `envconfig:"MYSQL_USER" default:"srvuser"`
 	Passwd    string        `envconfig:"MYSQL_PASSWD" default:"srvuser"`
 	Database  string        `envconfig:"MYSQL_DATABASE" default:"users"`
