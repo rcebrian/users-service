@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
 	durpb "github.com/golang/protobuf/ptypes/duration"
 	"github.com/sirupsen/logrus"
 	logtypepb "google.golang.org/genproto/googleapis/logging/type"
@@ -28,10 +29,7 @@ func StackdriverFormat(f *Formatter) error {
 	}
 	f.TimestampFormat = func(fields logrus.Fields, now time.Time) error {
 		// https://cloud.google.com/logging/docs/agent/configuration#timestamp-processing
-		ts, err := ptypes.TimestampProto(now)
-		if err != nil {
-			return err
-		}
+		ts := timestamppb.New(now)
 		fields["timestamp"] = ts
 		return nil
 	}
@@ -105,7 +103,7 @@ func (r HTTPRequest) MarshalJSON() ([]byte, error) {
 		e.ResponseSize = fmt.Sprintf("%d", r.ResponseSize)
 	}
 	if r.Latency != 0 {
-		e.Latency = ptypes.DurationProto(r.Latency)
+		e.Latency = durationpb.New(r.Latency)
 	}
 
 	return json.Marshal(e)
