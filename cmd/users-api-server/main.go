@@ -92,7 +92,7 @@ func main() {
 
 	_ = srv.Shutdown(ctx)
 
-	logrus.Warn("http server closed")
+	logrus.Info("shutting down HTTP server...")
 	os.Exit(0)
 }
 
