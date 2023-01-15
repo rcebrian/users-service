@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/types/known/durationpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"time"
 	"unicode/utf8"
+
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	durpb "github.com/golang/protobuf/ptypes/duration"
 	"github.com/sirupsen/logrus"
@@ -37,7 +38,7 @@ func StackdriverFormat(f *Formatter) error {
 	return nil
 }
 
-// HTTPRequest contains an http.Request as well as additional
+// HTTPRequest contains a http.Request as well as additional
 // information about the request and its response.
 // https://github.com/googleapis/google-cloud-go/blob/v0.39.0/logging/logging.go#L617
 type HTTPRequest struct {
