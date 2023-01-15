@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/rcebrian/users-service/pkg/log/formatters"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/rcebrian/users-service/pkg/log/formatters"
 
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
