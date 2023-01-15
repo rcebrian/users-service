@@ -62,7 +62,7 @@ func init() {
 	go func() {
 		logrus.Debugf("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
 
-		if err := bootstrap.RunInternalServer(db); err != nil {
+		if err = bootstrap.RunInternalServer(db); err != nil {
 			logrus.Fatal(err)
 		}
 	}()
