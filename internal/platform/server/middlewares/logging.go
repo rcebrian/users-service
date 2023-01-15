@@ -43,6 +43,5 @@ func Logging(next http.Handler) http.Handler {
 		}
 
 		logrus.WithField("httpRequest", req).Info()
-
 	})
 }
