@@ -33,9 +33,11 @@ type Formatter struct {
 // NewFormatter with optional options. Defaults to the Stackdriver option.
 func NewFormatter(opts ...Format) *Formatter {
 	f := Formatter{}
+
 	if len(opts) == 0 {
 		opts = append(opts, DefaultFormat)
 	}
+
 	for _, apply := range opts {
 		if err := apply(&f); err != nil {
 			panic(err)
@@ -48,6 +50,7 @@ func NewFormatter(opts ...Format) *Formatter {
 // Format the log entry. Implements logrus.Formatter.
 func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	data := make(logrus.Fields, len(entry.Data)+3)
+
 	for k, v := range entry.Data {
 		switch v := v.(type) {
 		case error:
@@ -58,6 +61,7 @@ func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 			data[k] = v
 		}
 	}
+
 	prefixFieldClashes(data, entry.HasCaller())
 
 	if !f.DisableTimestamp && f.TimestampFormat != nil {
@@ -80,9 +84,11 @@ func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	if entry.HasCaller() {
 		funcVal := entry.Caller.Function
 		fileVal := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
+
 		if funcVal != "" {
 			data[logrus.FieldKeyFunc] = funcVal
 		}
+
 		if fileVal != "" {
 			data[logrus.FieldKeyFile] = fileVal
 		}
@@ -99,6 +105,7 @@ func (f *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	if f.PrettyPrint {
 		encoder.SetIndent("", "  ")
 	}
+
 	if err := encoder.Encode(data); err != nil {
 		return nil, fmt.Errorf("failed to marshal fields to JSON, %v", err)
 	}
@@ -141,6 +148,7 @@ func prefixFieldClashes(data logrus.Fields, reportCaller bool) {
 		if l, ok := data[logrus.FieldKeyFunc]; ok {
 			data["fields."+logrus.FieldKeyFunc] = l
 		}
+
 		if l, ok := data[logrus.FieldKeyFile]; ok {
 			data["fields."+logrus.FieldKeyFile] = l
 		}

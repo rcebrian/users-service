@@ -32,6 +32,7 @@ func StackdriverFormat(f *Formatter) error {
 		// https://cloud.google.com/logging/docs/agent/configuration#timestamp-processing
 		ts := timestamppb.New(now)
 		fields["timestamp"] = ts
+
 		return nil
 	}
 
@@ -83,6 +84,7 @@ func (r HTTPRequest) MarshalJSON() ([]byte, error) {
 	if r.Request == nil {
 		return nil, nil
 	}
+
 	u := *r.Request.URL
 	u.Fragment = ""
 	// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#HttpRequest
@@ -100,9 +102,11 @@ func (r HTTPRequest) MarshalJSON() ([]byte, error) {
 	if r.RequestSize > 0 {
 		e.RequestSize = fmt.Sprintf("%d", r.RequestSize)
 	}
+
 	if r.ResponseSize > 0 {
 		e.ResponseSize = fmt.Sprintf("%d", r.ResponseSize)
 	}
+
 	if r.Latency != 0 {
 		e.Latency = durationpb.New(r.Latency)
 	}
@@ -139,6 +143,7 @@ func fixUTF8(s string) string {
 	// Otherwise time to build the sequence.
 	buf := new(bytes.Buffer)
 	buf.Grow(len(s))
+
 	for _, r := range s {
 		if utf8.ValidRune(r) {
 			buf.WriteRune(r)
@@ -146,5 +151,6 @@ func fixUTF8(s string) string {
 			buf.WriteRune('\uFFFD')
 		}
 	}
+
 	return buf.String()
 }
