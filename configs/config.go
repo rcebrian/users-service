@@ -14,11 +14,11 @@ type ServiceConf struct {
 var HttpServerConfig HttpServerConf
 
 type HttpServerConf struct {
-	Port         int `envconfig:"HTTP_PORT" default:"8080"`
-	GracefulTime int `envconfig:"HTTP_GRACEFUL_TIME" default:"30"`
-	WriteTimeout int `envconfig:"HTTP_WRITE_TIMEOUT" default:"15"`
-	ReadTimeout  int `envconfig:"HTTP_READ_TIMEOUT" default:"15"`
-	IdleTimeout  int `envconfig:"HTTP_IDLE_TIMEOUT" default:"60"`
+	Port         int           `envconfig:"HTTP_PORT" default:"8080"`
+	GracefulTime time.Duration `envconfig:"HTTP_GRACEFUL_TIME" default:"30s"`
+	ReadTimeout  time.Duration `envconfig:"HTTP_READ_TIMEOUT" default:"5s"`
+	WriteTimeout time.Duration `envconfig:"HTTP_WRITE_TIMEOUT" default:"10s"`
+	IdleTimeout  time.Duration `envconfig:"HTTP_IDLE_TIMEOUT" default:"90s"`
 }
 
 var MySqlConfig MySqlConf

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/rcebrian/users-service/pkg/health"
 	"github.com/rcebrian/users-service/pkg/health/providers"
@@ -55,9 +54,9 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	return &http.Server{
 		Addr: addr,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(configs.HttpServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(configs.HttpServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(configs.HttpServerConfig.IdleTimeout),
+		WriteTimeout: configs.HttpServerConfig.WriteTimeout,
+		ReadTimeout:  configs.HttpServerConfig.ReadTimeout,
+		IdleTimeout:  configs.HttpServerConfig.IdleTimeout,
 		Handler:      router,
 	}
 }
