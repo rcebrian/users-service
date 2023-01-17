@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/rcebrian/users-service/pkg/log/formatters"
+
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
 	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
@@ -26,6 +28,8 @@ func init() {
 		err   error
 		level logrus.Level
 	)
+
+	logrus.SetFormatter(formatters.NewFormatter())
 
 	if err = envconfig.Process("", &configs.ServiceConfig); err != nil {
 		logrus.WithError(err).Fatal("APP environment variables could not be processed")
@@ -47,20 +51,18 @@ func init() {
 
 	loadOASpecs()
 
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-
 	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
 		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
 		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
 		configs.MySqlConfig.Database,
-		time.Duration(configs.MySqlConfig.Timeout)*time.Second)
+		configs.MySqlConfig.Timeout)
 	db, _ = sql.Open("mysql", mysqlURI)
 
 	// starts the internal service with private endpoints
 	go func() {
 		logrus.Debugf("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
 
-		if err := bootstrap.RunInternalServer(db); err != nil {
+		if err = bootstrap.RunInternalServer(db); err != nil {
 			logrus.Fatal(err)
 		}
 	}()

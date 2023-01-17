@@ -4,17 +4,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rcebrian/users-service/pkg/log/formatters"
+
 	"github.com/sirupsen/logrus"
 )
 
 type StatusRecorder struct {
 	http.ResponseWriter
 	Status int
+	Size   int
 }
 
 func (r *StatusRecorder) WriteHeader(status int) {
 	r.Status = status
 	r.ResponseWriter.WriteHeader(status)
+}
+
+func (r *StatusRecorder) Write(buf []byte) (int, error) {
+	r.Size = len(buf)
+	return r.ResponseWriter.Write(buf)
 }
 
 // Logging middleware that logs all requests
@@ -23,13 +31,17 @@ func Logging(next http.Handler) http.Handler {
 		start := time.Now()
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
 		next.ServeHTTP(recorder, r)
-		logrus.Infof("%s \"%s %s %s\" %d %d \"%s\" %s",
-			r.RemoteAddr,
-			r.Method, r.RequestURI, r.Proto,
-			recorder.Status,
-			r.ContentLength,
-			r.Header.Get("User-Agent"),
-			time.Since(start),
-		)
+
+		req := &formatters.HTTPRequest{
+			Request:      r,
+			RequestSize:  r.ContentLength,
+			Status:       recorder.Status,
+			ResponseSize: int64(recorder.Size),
+			Latency:      time.Since(start),
+			LocalIP:      r.Host,
+			RemoteIP:     r.RemoteAddr,
+		}
+
+		logrus.WithField("httpRequest", req).Info()
 	})
 }
