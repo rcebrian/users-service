@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/rcebrian/users-service/pkg/log/formatters"
 
@@ -60,7 +59,7 @@ func init() {
 
 	// starts the internal service with private endpoints
 	go func() {
-		logrus.Debugf("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
+		logrus.Infof("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
 
 		if err = bootstrap.RunInternalServer(db); err != nil {
 			logrus.Fatal(err)
@@ -71,15 +70,12 @@ func init() {
 func main() {
 	userRepo := mysql.NewUserRepository(db)
 
-	var gracefulTime = time.Second * time.Duration(configs.HttpServerConfig.GracefulTime)
+	server := bootstrap.NewServer(userRepo)
 
-	srv := bootstrap.NewServer(userRepo)
-
-	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
 		logrus.Infof("http server starting on port :%d", configs.HttpServerConfig.Port)
 
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logrus.Fatal(err)
 		}
 	}()
@@ -89,10 +85,10 @@ func main() {
 
 	<-c
 
-	ctx, cancel := context.WithTimeout(context.Background(), gracefulTime)
+	ctx, cancel := context.WithTimeout(context.Background(), configs.HttpServerConfig.GracefulTime)
 	defer cancel()
 
-	_ = srv.Shutdown(ctx)
+	_ = server.Shutdown(ctx)
 
 	logrus.Info("shutting down HTTP server...")
 	os.Exit(0)
