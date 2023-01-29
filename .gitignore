@@ -8,13 +8,7 @@ coverage/
 # IDEs
 .idea/
 .fleet/
+.vscode/
 
 # api gen
-internal/platform/server/.openapi-generator
-internal/platform/server/openapi/*.go
-/gen
-
-# not ignore services
-!internal/platform/server/openapi/*_service.go
-!internal/platform/server/openapi/*_service_test.go
-!internal/platform/server/openapi/*mapper*.go
+internal/platform/server/*gen.go

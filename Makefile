@@ -13,10 +13,8 @@ run-server:
 
 .PHONY: api
 api:
-	oapi-codegen \
-		--config=./api/openapi-specs/configs/server.yaml \
+	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \
 		api/openapi-specs/openapi.yaml > internal/platform/server/api_server.gen.go
-	#scripts/api/codegen.sh
 
 api-clean:
 	find internal/platform/server/openapi -type f -not -name '*_service.go'  -and ! -name '*_service_test.go' \
