@@ -17,10 +17,10 @@ api:
 		api/openapi-specs/openapi.yaml > internal/platform/server/api_server.gen.go
 
 api-clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go'  -and ! -name '*_service_test.go' \
-		-and ! -name '*mapper*.go' -delete
+	find internal/platform/server -type f  -name '*.gen.go' -delete
 
 lint:
+	gofmt -w -s .
 	goimports -w .
 	golangci-lint run
 
