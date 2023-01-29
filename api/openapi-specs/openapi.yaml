@@ -18,17 +18,6 @@ tags:
   - name: users
     description: Users use cases
 paths:
-  /health:
-    get:
-      tags:
-        - system
-      operationId: getHealth
-      summary: Health check
-      description: Checks the API itself and all critical dependencies (available under the port 8079 or HTTP_HEALTH_PORT  environment variable). For internal purposes
-      x-internal: true
-      responses:
-        '200':
-          description: OK
   /users:
     get:
       tags:
@@ -48,6 +37,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/UserDto'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     post:
       summary: Create user
       operationId: createUser

@@ -8,11 +8,12 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
+
 	"github.com/rcebrian/users-service/pkg/log/formatters"
 
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
-	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
 	"github.com/rcebrian/users-service/pkg/yaml"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -70,6 +71,7 @@ func init() {
 func main() {
 	userRepo := mysql.NewUserRepository(db)
 
+	//server := bootstrap.NewServer(userRepo)
 	server := bootstrap.NewServer(userRepo)
 
 	go func() {
@@ -96,7 +98,7 @@ func main() {
 
 // loadOASpecs loads ServiceID and Version from OpenAPI specs file
 func loadOASpecs() {
-	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
+	oa, _ := yaml.ReadOpenAPI("api/openapi-specs/openapi.yaml")
 	configs.ServiceConfig.ServiceID = oa.Info.ServiceID
 	configs.ServiceConfig.ServiceVersion = oa.Info.Version
 }

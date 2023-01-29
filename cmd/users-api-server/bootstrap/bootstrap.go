@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/rcebrian/users-service/pkg/health"
-	"github.com/rcebrian/users-service/pkg/health/providers"
-
+	"github.com/go-chi/chi/v5"
 	"github.com/rcebrian/users-service/configs"
 	users "github.com/rcebrian/users-service/internal"
-	server "github.com/rcebrian/users-service/internal/platform/server/openapi"
+	"github.com/rcebrian/users-service/internal/platform/server"
 	"github.com/rcebrian/users-service/internal/users/creating"
 	"github.com/rcebrian/users-service/internal/users/finding"
+	"github.com/rcebrian/users-service/pkg/health"
+	"github.com/rcebrian/users-service/pkg/health/providers"
+	"github.com/rcebrian/users-service/pkg/http/server/middlewares"
 
 	"github.com/mvrilo/go-redoc"
 )
@@ -31,7 +32,7 @@ func RunInternalServer(sqlClient *sql.DB) error {
 	doc := redoc.Redoc{
 		Title:       "API Docs",
 		Description: "API documentation",
-		SpecFile:    "./api/openapi-spec/openapi.yaml",
+		SpecFile:    "./api/openapi-specs/openapi.yaml",
 		SpecPath:    "/openapi.yaml",
 		DocsPath:    "/docs",
 	}
@@ -44,30 +45,31 @@ func RunInternalServer(sqlClient *sql.DB) error {
 
 // NewServer create a new configured server
 func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", configs.HttpServerConfig.Port)
+	router := chi.NewRouter()
 
-	// users
-	UsersApiController := usersApiController(userRepo)
+	router.Use(middlewares.PanicRecovery)
+	router.Use(middlewares.Logging)
+	router.Use(middlewares.Cors)
 
-	router := server.NewRouter(UsersApiController)
+	usersStrictHandler := newApiHandler(userRepo)
+	server.HandlerFromMux(usersStrictHandler, router)
 
 	return &http.Server{
-		Addr: addr,
-		// Good practice to set timeouts to avoid Slowloris attacks.
+		Addr:         fmt.Sprintf(":%d", configs.HttpServerConfig.Port),
+		Handler:      router,
 		WriteTimeout: configs.HttpServerConfig.WriteTimeout,
 		ReadTimeout:  configs.HttpServerConfig.ReadTimeout,
 		IdleTimeout:  configs.HttpServerConfig.IdleTimeout,
-		Handler:      router,
 	}
 }
 
-// usersApiController configure users controller with dependency injection
-func usersApiController(userRepo users.UserRepository) server.Router {
+// newApiHandler configure users controller with dependency injection
+func newApiHandler(userRepo users.UserRepository) server.ServerInterface {
 	createService := creating.NewCreatingService(userRepo)
 	findAllService := finding.NewFindAllUsersUseCase(userRepo)
 	findByIdService := finding.NewFindUserByIdUseCase(userRepo)
 
-	UsersApiService := server.NewUsersApiService(createService, findAllService, findByIdService)
+	strictServer := server.NewUsersApiServer(createService, findAllService, findByIdService)
 
-	return server.NewUsersApiController(UsersApiService)
+	return server.NewStrictHandler(strictServer, nil)
 }
