@@ -12,6 +12,7 @@ type ServiceConf struct {
 }
 
 var HttpServerConfig HttpServerConf
+var HealthHttpServerConfig HttpServerConf
 
 type HttpServerConf struct {
 	Port         int           `envconfig:"HTTP_PORT" default:"8080"`

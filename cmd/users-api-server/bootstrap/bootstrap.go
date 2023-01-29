@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/rcebrian/users-service/configs"
 	users "github.com/rcebrian/users-service/internal"
@@ -18,29 +21,28 @@ import (
 	"github.com/mvrilo/go-redoc"
 )
 
-// RunInternalServer starts a server for healthcheck status
-func RunInternalServer(sqlClient *sql.DB) error {
+// NewHealthServer starts a server for healthcheck status
+func NewHealthServer(sqlClient *sql.DB) *http.Server {
+	if err := envconfig.Process("HEALTH", &configs.HealthHttpServerConfig); err != nil {
+		logrus.WithError(err).Fatal("HEALTH environment variables could not be processed")
+	}
+
+	healthHandler := http.NewServeMux()
+
 	mysqlAffectedEndpoints := []string{"/users", "/user"}
 
 	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, sqlClient, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
 	healthService := health.NewHealthService(configs.ServiceConfig.ServiceID, configs.ServiceConfig.ServiceVersion, mysqlHealth)
 
-	addr := fmt.Sprintf(":%d", configs.ServiceConfig.HttpInternalPort)
-	internal := http.NewServeMux()
-	internal.HandleFunc("/health", healthService.Handler)
+	healthHandler.HandleFunc("/health", healthService.Handler)
 
-	doc := redoc.Redoc{
-		Title:       "API Docs",
-		Description: "API documentation",
-		SpecFile:    "./api/openapi-specs/openapi.yaml",
-		SpecPath:    "/openapi.yaml",
-		DocsPath:    "/docs",
+	return &http.Server{
+		Addr:         fmt.Sprintf(":%d", configs.HealthHttpServerConfig.Port),
+		Handler:      healthHandler,
+		WriteTimeout: configs.HealthHttpServerConfig.WriteTimeout,
+		ReadTimeout:  configs.HealthHttpServerConfig.ReadTimeout,
+		IdleTimeout:  configs.HealthHttpServerConfig.IdleTimeout,
 	}
-
-	internal.HandleFunc(doc.DocsPath, doc.Handler())
-	internal.HandleFunc(doc.SpecPath, doc.Handler())
-
-	return http.ListenAndServe(addr, internal)
 }
 
 // NewServer create a new configured server
@@ -50,6 +52,16 @@ func NewServer(userRepo users.UserRepository) *http.Server {
 	router.Use(middlewares.PanicRecovery)
 	router.Use(middlewares.Logging)
 	router.Use(middlewares.Cors)
+
+	apiDoc := redoc.Redoc{
+		Title:       "API Docs",
+		Description: "API documentation",
+		SpecFile:    "./api/openapi-specs/openapi.yaml",
+		SpecPath:    "/openapi.yaml",
+		DocsPath:    "/docs",
+	}
+	router.Method(http.MethodGet, apiDoc.DocsPath, apiDoc.Handler())
+	router.Method(http.MethodGet, apiDoc.SpecPath, apiDoc.Handler())
 
 	usersStrictHandler := newApiHandler(userRepo)
 	server.HandlerFromMux(usersStrictHandler, router)

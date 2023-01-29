@@ -58,11 +58,12 @@ func init() {
 		configs.MySqlConfig.Timeout)
 	db, _ = sql.Open("mysql", mysqlURI)
 
-	// starts the internal service with private endpoints
-	go func() {
-		logrus.Infof("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
+	healthServer := bootstrap.NewHealthServer(db)
 
-		if err = bootstrap.RunInternalServer(db); err != nil {
+	go func() {
+		logrus.Infof("healthcheck running on :%d/health", configs.HealthHttpServerConfig.Port)
+
+		if err = healthServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logrus.Fatal(err)
 		}
 	}()

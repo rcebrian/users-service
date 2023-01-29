@@ -13,8 +13,6 @@ servers:
   - url: 'http://localhost:8080'
     description: localhost environment
 tags:
-  - name: system
-    description: System health operations
   - name: users
     description: Users use cases
 paths:
