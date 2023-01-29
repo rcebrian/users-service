@@ -5,24 +5,42 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/mvrilo/go-redoc"
+	"github.com/sirupsen/logrus"
+
 	"github.com/rcebrian/users-service/configs"
 	users "github.com/rcebrian/users-service/internal"
 	"github.com/rcebrian/users-service/internal/platform/server"
+	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
 	"github.com/rcebrian/users-service/internal/users/creating"
 	"github.com/rcebrian/users-service/internal/users/finding"
+
 	"github.com/rcebrian/users-service/pkg/health"
 	"github.com/rcebrian/users-service/pkg/health/providers"
 	"github.com/rcebrian/users-service/pkg/http/server/middlewares"
-
-	"github.com/mvrilo/go-redoc"
 )
 
+var db *sql.DB
+
+func init() {
+	if err := envconfig.Process("", &configs.MySqlConfig); err != nil {
+		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
+	}
+
+	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
+		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
+		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
+		configs.MySqlConfig.Database,
+		configs.MySqlConfig.Timeout)
+	db, _ = sql.Open("mysql", mysqlURI)
+}
+
 // NewHealthServer starts a server for healthcheck status
-func NewHealthServer(sqlClient *sql.DB) *http.Server {
+func NewHealthServer() *http.Server {
 	if err := envconfig.Process("HEALTH", &configs.HealthHttpServerConfig); err != nil {
 		logrus.WithError(err).Fatal("HEALTH environment variables could not be processed")
 	}
@@ -31,7 +49,7 @@ func NewHealthServer(sqlClient *sql.DB) *http.Server {
 
 	mysqlAffectedEndpoints := []string{"/users", "/user"}
 
-	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, sqlClient, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
+	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, db, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
 	healthService := health.NewHealthService(configs.ServiceConfig.ServiceID, configs.ServiceConfig.ServiceVersion, mysqlHealth)
 
 	healthHandler.HandleFunc("/health", healthService.Handler)
@@ -45,8 +63,14 @@ func NewHealthServer(sqlClient *sql.DB) *http.Server {
 	}
 }
 
-// NewServer create a new configured server
-func NewServer(userRepo users.UserRepository) *http.Server {
+// NewApiServer create a new configured server
+func NewApiServer() *http.Server {
+	if err := envconfig.Process("", &configs.HttpServerConfig); err != nil {
+		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
+	}
+
+	userRepo := mysql.NewUserRepository(db)
+
 	router := chi.NewRouter()
 
 	router.Use(middlewares.PanicRecovery)
