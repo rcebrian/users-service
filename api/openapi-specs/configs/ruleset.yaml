@@ -1,4 +1,5 @@
-description: Every single rule that is built-in to vacuum. The full monty
+description: vacuum tool rules to lint and pass oas3 verification
+documentationUrl: https://quobix.com/vacuum/rulesets/all
 rules:
   # Examples
   oas3-valid-schema-example: true
@@ -27,7 +28,6 @@ rules:
 
   # Spec Information
   oas3-host-trailing-slash: true
-  ### oas3-host-not-example: true # not working
   info-description: true
   license-url: true
 
@@ -39,7 +39,6 @@ rules:
   # Descriptions
   component-description: true
   description-duplication: true
-  oas2-parameter-description: true
   oas3-parameter-description: true
   operation-description: true
 
