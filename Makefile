@@ -19,7 +19,10 @@ api:
 api-clean:
 	find internal/platform/server -type f  -name '*.gen.go' -delete
 
-lint:
+api-lint:
+	vacuum lint -d -n error -r api/openapi-specs/configs/ruleset.yaml api/openapi-specs/openapi.yaml
+
+go-lint:
 	gofmt -w -s .
 	goimports -w .
 	golangci-lint run
