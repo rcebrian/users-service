@@ -9,12 +9,21 @@ import (
 	"github.com/rcebrian/users-service/internal/users/finding"
 )
 
-var _ StrictServerInterface = (*UsersApiService)(nil)
-
 type UsersApiService struct {
 	creatingService creating.CreateUserUseCase
 	findAllService  finding.FindAllUsersUseCase
 	findByIdService finding.FindUserByIdUseCase
+}
+
+var _ StrictServerInterface = (*UsersApiService)(nil)
+
+// NewUsersApiServer creates a default api users
+func NewUsersApiServer(creatingService creating.CreateUserUseCase, findAllService finding.FindAllUsersUseCase, findByIdService finding.FindUserByIdUseCase) StrictServerInterface {
+	return &UsersApiService{
+		creatingService: creatingService,
+		findAllService:  findAllService,
+		findByIdService: findByIdService,
+	}
 }
 
 // GetAllUsers - Get all users
@@ -67,13 +76,4 @@ func (u UsersApiService) GetUserById(ctx context.Context, request GetUserByIdReq
 	dto := UserToUserDto(user)
 
 	return GetUserById200JSONResponse{Name: dto.Name, Firstname: dto.Firstname, Id: dto.Firstname}, err
-}
-
-// NewUsersApiServer creates a default api users
-func NewUsersApiServer(creatingService creating.CreateUserUseCase, findAllService finding.FindAllUsersUseCase, findByIdService finding.FindUserByIdUseCase) StrictServerInterface {
-	return &UsersApiService{
-		creatingService: creatingService,
-		findAllService:  findAllService,
-		findByIdService: findByIdService,
-	}
 }
