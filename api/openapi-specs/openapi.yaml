@@ -7,28 +7,15 @@ info:
   contact:
     email: rcebrian@github.com
   license:
-    name: MIT
-    url: 'https://www.mit.edu/~amini/LICENSE.md'
+    name: 'MIT'
+    url: https://opensource.org/licenses/MIT
 servers:
   - url: 'http://localhost:8080'
     description: localhost environment
 tags:
-  - name: system
-    description: System health operations
   - name: users
     description: Users use cases
 paths:
-  /health:
-    get:
-      tags:
-        - system
-      operationId: getHealth
-      summary: Health check
-      description: Checks the API itself and all critical dependencies (available under the port 8079 or HTTP_HEALTH_PORT  environment variable). For internal purposes
-      x-internal: true
-      responses:
-        '200':
-          description: OK
   /users:
     get:
       tags:
@@ -47,7 +34,11 @@ paths:
                   users:
                     type: array
                     items:
-                      $ref: '#/components/schemas/UserDto'
+                      $ref: '#/components/schemas/user-dto'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
     post:
       summary: Create user
       operationId: createUser
@@ -67,10 +58,11 @@ paths:
           description: Internal Server Error
       description: Save user into data storage
       requestBody:
+        description: Required data to register a new user
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserDto'
+              $ref: '#/components/schemas/user-dto'
       tags:
         - users
   '/users/{userId}':
@@ -84,7 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/user-dto'
         '404':
           description: Not Found
         '500':
@@ -100,14 +92,17 @@ paths:
         description: Numeric ID of the user to get
 components:
   schemas:
-    UserDto:
+    user-dto:
       title: UserDto
       type: object
-      description: 'User model for API operations'
+      description: 'Entity that represents an user'
       properties:
         id:
           type: string
+          example: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
         name:
           type: string
+          example: John
         firstname:
           type: string
+          example: Doe

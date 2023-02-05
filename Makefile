@@ -13,13 +13,17 @@ run-server:
 
 .PHONY: api
 api:
-	scripts/api/codegen.sh
+	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \
+		api/openapi-specs/openapi.yaml > internal/platform/server/api_server.gen.go
 
 api-clean:
-	find internal/platform/server/openapi -type f -not -name '*_service.go'  -and ! -name '*_service_test.go' \
-		-and ! -name '*mapper*.go' -delete
+	find internal/platform/server -type f  -name '*.gen.go' -delete
 
-lint:
+api-lint:
+	vacuum lint -d -n error -r api/openapi-specs/configs/ruleset.yaml api/openapi-specs/openapi.yaml
+
+go-lint:
+	gofmt -w -s .
 	goimports -w .
 	golangci-lint run
 

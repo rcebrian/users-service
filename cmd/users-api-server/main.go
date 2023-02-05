@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,15 +10,11 @@ import (
 
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
-	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
 	"github.com/rcebrian/users-service/pkg/yaml"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
-
-var db *sql.DB
 
 func init() {
 	var (
@@ -34,14 +28,6 @@ func init() {
 		logrus.WithError(err).Fatal("APP environment variables could not be processed")
 	}
 
-	if err = envconfig.Process("", &configs.HttpServerConfig); err != nil {
-		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
-	}
-
-	if err = envconfig.Process("", &configs.MySqlConfig); err != nil {
-		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
-	}
-
 	if level, err = logrus.ParseLevel(configs.ServiceConfig.LogLevel); err != nil {
 		logrus.WithError(err).Fatal("error parsing log level")
 	}
@@ -50,27 +36,19 @@ func init() {
 
 	loadOASpecs()
 
-	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
-		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
-		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
-		configs.MySqlConfig.Database,
-		configs.MySqlConfig.Timeout)
-	db, _ = sql.Open("mysql", mysqlURI)
+	healthServer := bootstrap.NewHealthServer()
 
-	// starts the internal service with private endpoints
 	go func() {
-		logrus.Infof("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
+		logrus.Infof("healthcheck running on :%d/health", configs.HealthHttpServerConfig.Port)
 
-		if err = bootstrap.RunInternalServer(db); err != nil {
+		if err = healthServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logrus.Fatal(err)
 		}
 	}()
 }
 
 func main() {
-	userRepo := mysql.NewUserRepository(db)
-
-	server := bootstrap.NewServer(userRepo)
+	server := bootstrap.NewApiServer()
 
 	go func() {
 		logrus.Infof("http server starting on port :%d", configs.HttpServerConfig.Port)
@@ -96,7 +74,7 @@ func main() {
 
 // loadOASpecs loads ServiceID and Version from OpenAPI specs file
 func loadOASpecs() {
-	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
+	oa, _ := yaml.ReadOpenAPI("api/openapi-specs/openapi.yaml")
 	configs.ServiceConfig.ServiceID = oa.Info.ServiceID
 	configs.ServiceConfig.ServiceVersion = oa.Info.Version
 }
