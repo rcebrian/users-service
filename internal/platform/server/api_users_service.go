@@ -32,9 +32,9 @@ func (u UsersApiService) GetAllUsers(ctx context.Context, _ GetAllUsersRequestOb
 	if err != nil {
 		switch {
 		case errors.Is(err, users.ErrNotFound):
-			return GetAllUsers404Response{}, err
+			return GetAllUsers404JSONResponse{}, err
 		default:
-			return GetAllUsers500Response{}, err
+			return GetAllUsers500JSONResponse{}, err
 		}
 	}
 
@@ -52,9 +52,13 @@ func (u UsersApiService) CreateUser(ctx context.Context, request CreateUserReque
 			errors.Is(err, users.ErrEmptyUserName),
 			errors.Is(err, users.ErrEmptyFirstname):
 			cause := err.Error()
-			return CreateUser400JSONResponse{Errors: &cause}, err
+			return CreateUser400JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{
+				Code:    nil,
+				Message: &cause,
+				Success: false,
+			}}, err
 		default:
-			return CreateUser500Response{}, err
+			return CreateUser500JSONResponse{}, err
 		}
 	}
 
@@ -67,9 +71,9 @@ func (u UsersApiService) GetUserById(ctx context.Context, request GetUserByIdReq
 	if err != nil {
 		switch {
 		case errors.Is(err, users.ErrNotFound):
-			return GetUserById404Response{}, err
+			return GetUserById404JSONResponse{}, err
 		default:
-			return GetUserById500Response{}, err
+			return GetUserById500JSONResponse{}, err
 		}
 	}
 
