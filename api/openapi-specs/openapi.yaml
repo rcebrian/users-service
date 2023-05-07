@@ -1,14 +1,14 @@
 openapi: 3.0.3
 info:
   title: Users API
-  description: Users basic CRUD (create, read, update and delete)
+  description: 'Users basic CRUD (create, read, update and delete)'
   version: v1.0.0
   x-service: users-service
   contact:
     email: rcebrian@github.com
   license:
-    name: 'MIT'
-    url: https://opensource.org/licenses/MIT
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
 servers:
   - url: 'http://localhost:8080'
     description: localhost environment
@@ -35,10 +35,21 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/user-dto'
+              examples:
+                successful:
+                  summary: successful response with a list of users
+                  value:
+                    users:
+                      - id: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
+                        name: John
+                        firstname: Doe
+                      - id: 123e4567-e89b-12d3-a456-426614174000
+                        name: Susan
+                        firstname: Smith
         '404':
-          description: Not Found
+          $ref: '#/components/responses/unsuccessful-response'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/unsuccessful-response'
     post:
       summary: Create user
       operationId: createUser
@@ -46,16 +57,9 @@ paths:
         '201':
           description: Created
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: string
+          $ref: '#/components/responses/unsuccessful-response'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/unsuccessful-response'
       description: Save user into data storage
       requestBody:
         description: Required data to register a new user
@@ -77,10 +81,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/user-dto'
+              examples:
+                successful:
+                  summary: successful response with a user
+                  value:
+                    id: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
+                    name: John
+                    firstname: Doe
         '404':
-          description: Not Found
+          $ref: '#/components/responses/unsuccessful-response'
         '500':
-          description: Internal Server Error
+          $ref: '#/components/responses/unsuccessful-response'
       operationId: getUserById
       description: Retrieve user information from ID
     parameters:
@@ -95,7 +106,7 @@ components:
     user-dto:
       title: UserDto
       type: object
-      description: 'Entity that represents an user'
+      description: Entity that represents an user
       properties:
         id:
           type: string
@@ -106,3 +117,38 @@ components:
         firstname:
           type: string
           example: Doe
+      x-examples: {}
+    operational-response-dto:
+      title: response-dto
+      x-stoplight:
+        id: 0893q9z1hk80u
+      type: object
+      description: Response data wrapper
+      x-examples:
+        successful:
+          success: true
+          message: User created
+          code: 1
+        unsuccessful:
+          success: false
+          message: Invalid id
+          code: 1001
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: user created
+        code:
+          type: integer
+          format: int32
+          example: 1001
+      required:
+        - success
+  responses:
+    unsuccessful-response:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/operational-response-dto'
