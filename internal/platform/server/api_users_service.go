@@ -72,7 +72,6 @@ func (u UsersApiService) GetUserById(ctx context.Context, request GetUserByIdReq
 
 		switch {
 		case errors.Is(err, users.ErrNotFound):
-
 			return GetUserById404JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{
 				Message: &cause,
 				Success: false,
