@@ -38,19 +38,17 @@ func Test_UsersApiService_GetAllUsers_InternalServerError(t *testing.T) {
 	findAllServiceMock := new(mocks.FindAllUsersUseCase)
 	findByIdServiceMock := new(mocks.FindUserByIdUseCase)
 
-	mockedErr := errors.New("something unexpected happened")
+	errMsg := "something unexpected happened"
+	mockedErr := errors.New(errMsg)
 
 	findAllServiceMock.On("FindAll", mock.Anything).
-		Return(nil)
+		Return(nil, mockedErr)
 
 	apiService := NewUsersApiServer(createServiceMock, findAllServiceMock, findByIdServiceMock)
 
 	res, err := apiService.GetAllUsers(context.Background(), GetAllUsersRequestObject{})
 
 	assert.Error(t, err)
-
-	errMsg := mockedErr.Error()
-
 	assert.Equal(t, res, GetAllUsers500JSONResponse(OperationalResponseDto{Message: &errMsg, Success: false}))
 }
 
