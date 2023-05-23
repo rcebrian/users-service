@@ -27,7 +27,10 @@ func Test_UsersApiService_GetAllUsers_NotFoundError(t *testing.T) {
 	res, err := apiService.GetAllUsers(context.Background(), GetAllUsersRequestObject{})
 
 	assert.ErrorIs(t, err, users.ErrNotFound)
-	assert.Equal(t, res, GetAllUsers404JSONResponse{})
+
+	errMsg := users.ErrNotFound.Error()
+
+	assert.Equal(t, res, GetAllUsers404JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{Message: &errMsg, Success: false}}, err)
 }
 
 func Test_UsersApiService_GetAllUsers_InternalServerError(t *testing.T) {
@@ -35,15 +38,18 @@ func Test_UsersApiService_GetAllUsers_InternalServerError(t *testing.T) {
 	findAllServiceMock := new(mocks.FindAllUsersUseCase)
 	findByIdServiceMock := new(mocks.FindUserByIdUseCase)
 
+	errMsg := "something unexpected happened"
+	mockedErr := errors.New(errMsg)
+
 	findAllServiceMock.On("FindAll", mock.Anything).
-		Return(nil, errors.New("something unexpected happened"))
+		Return(nil, mockedErr)
 
 	apiService := NewUsersApiServer(createServiceMock, findAllServiceMock, findByIdServiceMock)
 
 	res, err := apiService.GetAllUsers(context.Background(), GetAllUsersRequestObject{})
 
 	assert.Error(t, err)
-	assert.Equal(t, res, GetAllUsers500JSONResponse{})
+	assert.Equal(t, res, GetAllUsers500JSONResponse(OperationalResponseDto{Message: &errMsg, Success: false}))
 }
 
 func Test_UsersApiService_GetAllUsers_Ok(t *testing.T) {
