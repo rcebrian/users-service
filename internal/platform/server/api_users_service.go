@@ -30,11 +30,13 @@ func NewUsersApiServer(creatingService creating.CreateUserUseCase, findAllServic
 func (u UsersApiService) GetAllUsers(ctx context.Context, _ GetAllUsersRequestObject) (GetAllUsersResponseObject, error) {
 	all, err := u.findAllService.FindAll(ctx)
 	if err != nil {
+		cause := err.Error()
+
 		switch {
 		case errors.Is(err, users.ErrNotFound):
-			return GetAllUsers404JSONResponse{}, err
+			return GetAllUsers404JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{Message: &cause, Success: false}}, err
 		default:
-			return GetAllUsers500JSONResponse{}, err
+			return GetAllUsers500JSONResponse(OperationalResponseDto{Message: &cause, Success: false}), err
 		}
 	}
 
@@ -44,21 +46,18 @@ func (u UsersApiService) GetAllUsers(ctx context.Context, _ GetAllUsersRequestOb
 }
 
 func (u UsersApiService) CreateUser(ctx context.Context, request CreateUserRequestObject) (CreateUserResponseObject, error) {
-	err := u.creatingService.Create(ctx, *request.Body.Name, *request.Body.Firstname)
+	err := u.creatingService.Create(ctx, request.Body.Name, request.Body.Firstname)
 
 	if err != nil {
+		cause := err.Error()
+
 		switch {
 		case errors.Is(err, users.ErrInvalidUserID),
 			errors.Is(err, users.ErrEmptyUserName),
 			errors.Is(err, users.ErrEmptyFirstname):
-			cause := err.Error()
-			return CreateUser400JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{
-				Code:    nil,
-				Message: &cause,
-				Success: false,
-			}}, err
+			return CreateUser400JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{Message: &cause, Success: false}}, err
 		default:
-			return CreateUser500JSONResponse{}, err
+			return CreateUser500JSONResponse(OperationalResponseDto{Message: &cause, Success: false}), err
 		}
 	}
 
@@ -69,15 +68,19 @@ func (u UsersApiService) GetUserById(ctx context.Context, request GetUserByIdReq
 	user, err := u.findByIdService.FindById(ctx, request.UserId)
 
 	if err != nil {
+		cause := err.Error()
+
 		switch {
 		case errors.Is(err, users.ErrNotFound):
-			return GetUserById404JSONResponse{}, err
+
+			return GetUserById404JSONResponse{UnsuccessfulResponseJSONResponse: UnsuccessfulResponseJSONResponse{
+				Message: &cause,
+				Success: false,
+			}}, err
 		default:
-			return GetUserById500JSONResponse{}, err
+			return GetUserById500JSONResponse(OperationalResponseDto{Message: &cause, Success: false}), err
 		}
 	}
 
-	dto := UserToUserDto(user)
-
-	return GetUserById200JSONResponse{Name: dto.Name, Firstname: dto.Firstname, Id: dto.Firstname}, err
+	return GetUserById200JSONResponse(UserToUserDto(user)), nil
 }

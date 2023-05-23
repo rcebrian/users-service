@@ -67,6 +67,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/user-dto'
+            example:
+              name: John
+              firstname: Doe
       tags:
         - users
   '/users/{userId}':
@@ -117,32 +120,26 @@ components:
         firstname:
           type: string
           example: Doe
-      x-examples: {}
+      required:
+        - name
+        - firstname
     operational-response-dto:
-      title: response-dto
-      x-stoplight:
-        id: 0893q9z1hk80u
+      title: Operational response
       type: object
       description: Response data wrapper
       x-examples:
         successful:
           success: true
           message: User created
-          code: 1
         unsuccessful:
           success: false
           message: Invalid id
-          code: 1001
       properties:
         success:
           type: boolean
         message:
           type: string
           example: user created
-        code:
-          type: integer
-          format: int32
-          example: 1001
       required:
         - success
   responses:

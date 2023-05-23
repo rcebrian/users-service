@@ -14,8 +14,8 @@ func UserToUserDto(user users.User) UserDto {
 
 	return UserDto{
 		Id:        &id,
-		Name:      &name,
-		Firstname: &firstname,
+		Name:      name,
+		Firstname: firstname,
 	}
 }
 
