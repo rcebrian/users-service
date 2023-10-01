@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rcebrian/users-service/pkg/log/formatters"
-
+	joonix "github.com/joonix/log"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +31,7 @@ func Logging(next http.Handler) http.Handler {
 		recorder := &StatusRecorder{ResponseWriter: w, Status: 200}
 		next.ServeHTTP(recorder, r)
 
-		req := &formatters.HTTPRequest{
+		req := &joonix.HTTPRequest{
 			Request:      r,
 			RequestSize:  r.ContentLength,
 			Status:       recorder.Status,

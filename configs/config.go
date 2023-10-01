@@ -1,13 +1,14 @@
 package configs
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 var ServiceConfig ServiceConf
 
 type ServiceConf struct {
-	ServiceID      string
-	ServiceVersion string
-	LogLevel       string `envconfig:"LOG_LEVEL" default:"info"`
+	LogLevel string `envconfig:"LOG_LEVEL" default:"info"`
 }
 
 var HttpServerConfig HttpServerConf
@@ -31,4 +32,11 @@ type MySqlConf struct {
 	User      string        `envconfig:"MYSQL_USER" default:"srvuser"`
 	Passwd    string        `envconfig:"MYSQL_PASSWD" default:"srvuser"`
 	Database  string        `envconfig:"MYSQL_DATABASE" default:"users"`
+}
+
+func (mysql MySqlConf) URI() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
+		mysql.User, mysql.Passwd,
+		mysql.Host, mysql.Port,
+		mysql.Database, mysql.Timeout)
 }

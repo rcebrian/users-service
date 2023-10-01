@@ -3,7 +3,6 @@ info:
   title: Users API
   description: 'Users basic CRUD (create, read, update and delete)'
   version: v1.0.0
-  x-service: users-service
   contact:
     email: rcebrian@github.com
   license:
