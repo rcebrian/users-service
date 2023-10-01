@@ -22,20 +22,25 @@ api-clean:
 api-lint:
 	vacuum lint -d -n error -r api/openapi-specs/configs/ruleset.yaml api/openapi-specs/openapi.yaml
 
-go-lint:
-	gofmt -w -s .
-	goimports -w .
+lint:
 	golangci-lint run
 
 clean: build-clean api-clean
 
 all: clean api build
 
-test:
+tests:
 	go test ./...
 
-test-coverage:
+tests-coverage:
 	go test ./... -cover
 
-test-coverage-reporter:
+tests-coverage-reporter:
 	scripts/test/reporter.sh
+
+install-tools:
+	go install golang.org/x/tools/cmd/goimports@latest
+	go install github.com/vektra/mockery/v2@v2.33.2
+	go install github.com/onsi/ginkgo/v2/ginkgo@2.12.0
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.14.0
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2

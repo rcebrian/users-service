@@ -3,6 +3,8 @@ package bootstrap
 import (
 	"database/sql"
 	"fmt"
+	users_service "github.com/rcebrian/users-service"
+	users_api_config "github.com/rcebrian/users-service/configs/users-api-server"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -31,12 +33,7 @@ func init() {
 		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
 	}
 
-	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
-		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
-		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
-		configs.MySqlConfig.Database,
-		configs.MySqlConfig.Timeout)
-	db, _ = sql.Open("mysql", mysqlURI)
+	db, _ = sql.Open("mysql", configs.MySqlConfig.URI())
 }
 
 // NewHealthServer starts a server for healthcheck status
@@ -50,7 +47,7 @@ func NewHealthServer() *http.Server {
 	mysqlAffectedEndpoints := []string{"/users", "/user"}
 
 	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, db, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
-	healthService := health.NewHealthService(configs.ServiceConfig.ServiceID, configs.ServiceConfig.ServiceVersion, mysqlHealth)
+	healthService := health.NewHealthService(users_api_config.ServiceID, users_service.VERSION, mysqlHealth)
 
 	healthHandler.HandleFunc("/health", healthService.Handler)
 
