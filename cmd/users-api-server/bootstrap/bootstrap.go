@@ -3,9 +3,10 @@ package bootstrap
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+
 	users_service "github.com/rcebrian/users-service"
 	users_api_config "github.com/rcebrian/users-service/configs/users-api-server"
-	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 

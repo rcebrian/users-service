@@ -2,10 +2,11 @@ package configs
 
 import (
 	"fmt"
+	"time"
+
 	joonix "github.com/joonix/log"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type envLogConfig struct {
@@ -20,6 +21,7 @@ func ConfigureLogger() error {
 		level     logrus.Level
 		logConfig envLogConfig
 	)
+
 	if err = envconfig.Process("", &logConfig); err != nil {
 		return err
 	}

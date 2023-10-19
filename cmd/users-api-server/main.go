@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	apiConfig "github.com/rcebrian/users-service/configs/users-api-server"
 	"net/http"
 	"os"
 	"os/signal"
+
+	apiConfig "github.com/rcebrian/users-service/configs/users-api-server"
 
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
