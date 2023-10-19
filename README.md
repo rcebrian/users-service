@@ -89,11 +89,6 @@ To get a local copy up and running follow these simple example steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 
-* openapi-generator-cli (npm based)
-  ```sh
-  npm install -g @openapitools/openapi-generator-cli@2.5.2
-  ```
-
 ### Installation
 
 

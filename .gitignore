@@ -1,14 +1,14 @@
 # binaries
-build/
+/build/
 
 # tests
-coverage/
+/coverage/
 *.out
 
 # IDEs
-.idea/
-.fleet/
-.vscode/
+/.idea/
+/.fleet/
+/.vscode/
 
-# api gen
-internal/platform/server/*gen.go
+# generated files
+*gen.go

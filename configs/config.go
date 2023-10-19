@@ -2,13 +2,35 @@ package configs
 
 import (
 	"fmt"
+	joonix "github.com/joonix/log"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
-var ServiceConfig ServiceConf
-
-type ServiceConf struct {
+type envLogConfig struct {
 	LogLevel string `envconfig:"LOG_LEVEL" default:"info"`
+}
+
+func ConfigureLogger() error {
+	logrus.SetFormatter(joonix.NewFormatter(joonix.StackdriverFormat))
+
+	var (
+		err       error
+		level     logrus.Level
+		logConfig envLogConfig
+	)
+	if err = envconfig.Process("", &logConfig); err != nil {
+		return err
+	}
+
+	if level, err = logrus.ParseLevel(logConfig.LogLevel); err != nil {
+		return err
+	}
+
+	logrus.SetLevel(level)
+
+	return nil
 }
 
 var HttpServerConfig HttpServerConf
