@@ -32,9 +32,9 @@ coverage: test
 
 install-tools:
 	# code generation
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.15.0
-	# test
 	go install github.com/vektra/mockery/v2@v2.33.2
+	go install github.com/daveshanley/vacuum@v0.3.13
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.15.0
 	# lint tools
 	go install golang.org/x/tools/cmd/goimports@latest
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ${GOPATH}/bin ${GOLANGCI_LINT_VERSION}
