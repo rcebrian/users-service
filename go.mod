@@ -6,8 +6,8 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/google/uuid v1.3.1
-	github.com/huandu/go-sqlbuilder v1.22.0
+	github.com/google/uuid v1.4.0
+	github.com/huandu/go-sqlbuilder v1.23.0
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mvrilo/go-redoc v0.1.4
@@ -26,8 +26,8 @@ require (
 	github.com/nelkinda/http-go v0.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.1 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	google.golang.org/genproto v0.0.0-20231016165738-49dd2c1f3d0b // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	google.golang.org/genproto v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"database/sql"
 	"fmt"
+
 	"net/http"
 
 	users_service "github.com/rcebrian/users-service"
