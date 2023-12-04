@@ -2,7 +2,7 @@ SHELL = /bin/bash
 MAKEFLAGS += --silent
 
 COVERAGE_DIR=coverage
-GOLANGCI_LINT_VERSION=v1.54.2
+GOLANGCI_LINT_VERSION=v1.55.2
 
 all: clean api build
 
