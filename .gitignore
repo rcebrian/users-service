@@ -1,6 +1,9 @@
 # binaries
 /build/
 
+# environment
+/.env
+
 # tests
 /coverage/
 *.out
