@@ -15,7 +15,7 @@ build:
 
 .PHONY: api
 api:
-	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \P
+	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \
 		api/openapi-specs/openapi.yaml > internal/platform/server/api_server.gen.go
 
 lint:
