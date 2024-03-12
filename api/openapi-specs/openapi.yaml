@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Users API
+  description: 'Users basic CRUD (create, read, update and delete)'
+  version: v1.0.0
+  contact:
+    email: rcebrian@github.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+servers:
+  - url: 'http://localhost:8080'
+    description: localhost environment
+tags:
+  - name: users
+    description: Users use cases
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      operationId: getAllUsers
+      summary: Get all users
+      description: Retrieve all users from data storage
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user-dto'
+              examples:
+                successful:
+                  summary: successful response with a list of users
+                  value:
+                    users:
+                      - id: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
+                        name: John
+                        firstname: Doe
+                      - id: 123e4567-e89b-12d3-a456-426614174000
+                        name: Susan
+                        firstname: Smith
+        '404':
+          $ref: '#/components/responses/unsuccessful-response'
+        '500':
+          $ref: '#/components/responses/unsuccessful-response'
+    post:
+      summary: Create user
+      operationId: createUser
+      responses:
+        '201':
+          description: Created
+        '400':
+          $ref: '#/components/responses/unsuccessful-response'
+        '500':
+          $ref: '#/components/responses/unsuccessful-response'
+      description: Save user into data storage
+      requestBody:
+        description: Required data to register a new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-dto'
+            example:
+              name: John
+              firstname: Doe
+      tags:
+        - users
+  '/users/{userId}':
+    get:
+      summary: Get user by id
+      tags:
+        - users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-dto'
+              examples:
+                successful:
+                  summary: successful response with a user
+                  value:
+                    id: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
+                    name: John
+                    firstname: Doe
+        '404':
+          $ref: '#/components/responses/unsuccessful-response'
+        '500':
+          $ref: '#/components/responses/unsuccessful-response'
+      operationId: getUserById
+      description: Retrieve user information from ID
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+        description: Numeric ID of the user to get
+components:
+  schemas:
+    user-dto:
+      title: UserDto
+      type: object
+      description: Entity that represents an user
+      properties:
+        id:
+          type: string
+          example: e8c58bf5-532d-458b-8c6d-b2f828f48b6c
+        name:
+          type: string
+          example: John
+        firstname:
+          type: string
+          example: Doe
+      required:
+        - name
+        - firstname
+    operational-response-dto:
+      title: Operational response
+      type: object
+      description: Response data wrapper
+      x-examples:
+        successful:
+          success: true
+          message: User created
+        unsuccessful:
+          success: false
+          message: Invalid id
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: user created
+      required:
+        - success
+  responses:
+    unsuccessful-response:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/operational-response-dto'

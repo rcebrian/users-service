@@ -2,83 +2,43 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
+	"errors"
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
+
+	apiConfig "github.com/rcebrian/users-service/configs/users-api-server"
 
 	"github.com/rcebrian/users-service/cmd/users-api-server/bootstrap"
 	"github.com/rcebrian/users-service/configs"
-	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
-	"github.com/rcebrian/users-service/pkg/yaml"
-
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
 
-var db *sql.DB
-
 func init() {
-	var (
-		err   error
-		level logrus.Level
-	)
-
-	if err = envconfig.Process("", &configs.ServiceConfig); err != nil {
-		logrus.WithError(err).Fatal("APP environment variables could not be processed")
+	err := apiConfig.ConfigureServer()
+	if err != nil {
+		logrus.WithError(err).Fatalf("error configuring %s application", apiConfig.ServiceID)
 	}
 
-	if err = envconfig.Process("", &configs.HttpServerConfig); err != nil {
-		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
-	}
+	healthServer := bootstrap.NewHealthServer()
 
-	if err = envconfig.Process("", &configs.MySqlConfig); err != nil {
-		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
-	}
-
-	if level, err = logrus.ParseLevel(configs.ServiceConfig.LogLevel); err != nil {
-		logrus.WithError(err).Fatal("error parsing log level")
-	}
-
-	logrus.SetLevel(level)
-
-	loadOASpecs()
-
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-
-	mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%s",
-		configs.MySqlConfig.User, configs.MySqlConfig.Passwd,
-		configs.MySqlConfig.Host, configs.MySqlConfig.Port,
-		configs.MySqlConfig.Database,
-		time.Duration(configs.MySqlConfig.Timeout)*time.Second)
-	db, _ = sql.Open("mysql", mysqlURI)
-
-	// starts the internal service with private endpoints
 	go func() {
-		logrus.Debugf("healthcheck running on :%d/health", configs.ServiceConfig.HttpInternalPort)
+		logrus.Infof("healthcheck running on :%d/health", configs.HealthHttpServerConfig.Port)
 
-		if err := bootstrap.RunInternalServer(db); err != nil {
+		if err = healthServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logrus.Fatal(err)
 		}
 	}()
 }
 
 func main() {
-	userRepo := mysql.NewUserRepository(db)
+	server := bootstrap.NewApiServer()
 
-	var gracefulTime = time.Second * time.Duration(configs.HttpServerConfig.GracefulTime)
-
-	srv := bootstrap.NewServer(userRepo)
-
-	// https://github.com/gorilla/mux#graceful-shutdown
 	go func() {
-		logrus.Infof("http server starting on port :%d", configs.HttpServerConfig.Port)
+		logrus.Infof("HTTP server starting on port %s", server.Addr)
 
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logrus.Fatal(err)
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logrus.WithError(err).Fatal("error starting HTTP server")
 		}
 	}()
 
@@ -87,18 +47,11 @@ func main() {
 
 	<-c
 
-	ctx, cancel := context.WithTimeout(context.Background(), gracefulTime)
+	ctx, cancel := context.WithTimeout(context.Background(), configs.HttpServerConfig.GracefulTime)
 	defer cancel()
 
-	_ = srv.Shutdown(ctx)
+	_ = server.Shutdown(ctx)
 
-	logrus.Warn("http server closed")
+	logrus.Info("shutting down HTTP server...")
 	os.Exit(0)
-}
-
-// loadOASpecs loads ServiceID and Version from OpenAPI specs file
-func loadOASpecs() {
-	oa, _ := yaml.ReadOpenAPI("api/openapi-spec/openapi.yaml")
-	configs.ServiceConfig.ServiceID = oa.Info.ServiceID
-	configs.ServiceConfig.ServiceVersion = oa.Info.Version
 }

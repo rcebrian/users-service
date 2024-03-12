@@ -6,10 +6,16 @@ import (
 
 // UserToUserDto maps a users.User to a server.UserDto
 func UserToUserDto(user users.User) UserDto {
+	var (
+		id        = user.ID().String()
+		name      = user.Name().String()
+		firstname = user.Firstname().String()
+	)
+
 	return UserDto{
-		Id:        user.ID().String(),
-		Name:      user.Name().String(),
-		Firstname: user.Firstname().String(),
+		Id:        &id,
+		Name:      name,
+		Firstname: firstname,
 	}
 }
 

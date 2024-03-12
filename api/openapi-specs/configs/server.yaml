@@ -1,0 +1,8 @@
+package: server
+generate:
+  chi-server: true
+  strict-server: true
+  models: true
+  # embedded-spec: true
+  # chi-server: true
+

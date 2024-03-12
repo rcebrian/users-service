@@ -3,72 +3,108 @@ package bootstrap
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
-	"time"
 
-	"github.com/rcebrian/users-service/pkg/health"
-	"github.com/rcebrian/users-service/pkg/health/providers"
+	"net/http"
+
+	users_service "github.com/rcebrian/users-service"
+	users_api_config "github.com/rcebrian/users-service/configs/users-api-server"
+
+	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/mvrilo/go-redoc"
+	"github.com/sirupsen/logrus"
 
 	"github.com/rcebrian/users-service/configs"
 	users "github.com/rcebrian/users-service/internal"
-	server "github.com/rcebrian/users-service/internal/platform/server/openapi"
+	"github.com/rcebrian/users-service/internal/platform/server"
+	"github.com/rcebrian/users-service/internal/platform/storage/mysql"
 	"github.com/rcebrian/users-service/internal/users/creating"
 	"github.com/rcebrian/users-service/internal/users/finding"
 
-	"github.com/mvrilo/go-redoc"
+	"github.com/rcebrian/users-service/pkg/health"
+	"github.com/rcebrian/users-service/pkg/health/providers"
+	"github.com/rcebrian/users-service/pkg/http/server/middlewares"
 )
 
-// RunInternalServer starts a server for healthcheck status
-func RunInternalServer(sqlClient *sql.DB) error {
+var db *sql.DB
+
+func init() {
+	if err := envconfig.Process("", &configs.MySqlConfig); err != nil {
+		logrus.WithError(err).Fatal("DATABASE environment variables could not be processed")
+	}
+
+	db, _ = sql.Open("mysql", configs.MySqlConfig.URI())
+}
+
+// NewHealthServer starts a server for healthcheck status
+func NewHealthServer() *http.Server {
+	if err := envconfig.Process("HEALTH", &configs.HealthHttpServerConfig); err != nil {
+		logrus.WithError(err).Fatal("HEALTH environment variables could not be processed")
+	}
+
+	healthHandler := http.NewServeMux()
+
 	mysqlAffectedEndpoints := []string{"/users", "/user"}
 
-	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, sqlClient, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
-	healthService := health.NewHealthService(configs.ServiceConfig.ServiceID, configs.ServiceConfig.ServiceVersion, mysqlHealth)
+	mysqlHealth := providers.NewMysqlProvider("mysql", mysqlAffectedEndpoints, db, configs.MySqlConfig.Timeout, configs.MySqlConfig.Threshold)
+	healthService := health.NewHealthService(users_api_config.ServiceID, users_service.VERSION, mysqlHealth)
 
-	addr := fmt.Sprintf(":%d", configs.ServiceConfig.HttpInternalPort)
-	internal := http.NewServeMux()
-	internal.HandleFunc("/health", healthService.Handler)
+	healthHandler.HandleFunc("/health", healthService.Handler)
 
-	doc := redoc.Redoc{
+	return &http.Server{
+		Addr:         fmt.Sprintf(":%d", configs.HealthHttpServerConfig.Port),
+		Handler:      healthHandler,
+		WriteTimeout: configs.HealthHttpServerConfig.WriteTimeout,
+		ReadTimeout:  configs.HealthHttpServerConfig.ReadTimeout,
+		IdleTimeout:  configs.HealthHttpServerConfig.IdleTimeout,
+	}
+}
+
+// NewApiServer create a new configured server
+func NewApiServer() *http.Server {
+	if err := envconfig.Process("", &configs.HttpServerConfig); err != nil {
+		logrus.WithError(err).Fatal("SERVER environment variables could not be processed")
+	}
+
+	userRepo := mysql.NewUserRepository(db)
+
+	router := chi.NewRouter()
+
+	router.Use(middlewares.PanicRecovery)
+	router.Use(middlewares.Logging)
+	router.Use(middlewares.Cors)
+
+	apiDoc := redoc.Redoc{
 		Title:       "API Docs",
 		Description: "API documentation",
-		SpecFile:    "./api/openapi-spec/openapi.yaml",
+		SpecFile:    "./api/openapi-specs/openapi.yaml",
 		SpecPath:    "/openapi.yaml",
 		DocsPath:    "/docs",
 	}
+	router.Method(http.MethodGet, apiDoc.DocsPath, apiDoc.Handler())
+	router.Method(http.MethodGet, apiDoc.SpecPath, apiDoc.Handler())
 
-	internal.HandleFunc(doc.DocsPath, doc.Handler())
-	internal.HandleFunc(doc.SpecPath, doc.Handler())
-
-	return http.ListenAndServe(addr, internal)
-}
-
-// NewServer create a new configured server
-func NewServer(userRepo users.UserRepository) *http.Server {
-	addr := fmt.Sprintf(":%d", configs.HttpServerConfig.Port)
-
-	// users
-	UsersApiController := usersApiController(userRepo)
-
-	router := server.NewRouter(UsersApiController)
+	usersStrictHandler := newApiHandler(userRepo)
+	server.HandlerFromMux(usersStrictHandler, router)
 
 	return &http.Server{
-		Addr: addr,
-		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * time.Duration(configs.HttpServerConfig.WriteTimeout),
-		ReadTimeout:  time.Second * time.Duration(configs.HttpServerConfig.ReadTimeout),
-		IdleTimeout:  time.Second * time.Duration(configs.HttpServerConfig.IdleTimeout),
+		Addr:         fmt.Sprintf(":%d", configs.HttpServerConfig.Port),
 		Handler:      router,
+		WriteTimeout: configs.HttpServerConfig.WriteTimeout,
+		ReadTimeout:  configs.HttpServerConfig.ReadTimeout,
+		IdleTimeout:  configs.HttpServerConfig.IdleTimeout,
 	}
 }
 
-// usersApiController configure users controller with dependency injection
-func usersApiController(userRepo users.UserRepository) server.Router {
+// newApiHandler configure users controller with dependency injection
+func newApiHandler(userRepo users.UserRepository) server.ServerInterface {
 	createService := creating.NewCreatingService(userRepo)
 	findAllService := finding.NewFindAllUsersUseCase(userRepo)
 	findByIdService := finding.NewFindUserByIdUseCase(userRepo)
 
-	UsersApiService := server.NewUsersApiService(createService, findAllService, findByIdService)
+	strictServer := server.NewUsersApiServer(createService, findAllService, findByIdService)
 
-	return server.NewUsersApiController(UsersApiService)
+	return server.NewStrictHandler(strictServer, nil)
 }

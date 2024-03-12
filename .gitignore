@@ -1,20 +1,17 @@
 # binaries
-build/
+/build/
+
+# environment
+/.env
 
 # tests
-coverage/
+/coverage/
 *.out
 
 # IDEs
-.idea/
-.fleet/
+/.idea/
+/.fleet/
+/.vscode/
 
-# api gen
-internal/platform/server/.openapi-generator
-internal/platform/server/openapi/*.go
-/gen
-
-# not ignore services
-!internal/platform/server/openapi/*_service.go
-!internal/platform/server/openapi/*_service_test.go
-!internal/platform/server/openapi/*mapper*.go
+# generated files
+*gen.go

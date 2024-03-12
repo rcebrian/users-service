@@ -1,0 +1,57 @@
+description: vacuum tool rules to lint and pass oas3 verification
+documentationUrl: https://quobix.com/vacuum/rulesets/all
+rules:
+  # Examples
+  oas3-valid-schema-example: true
+
+  # Operations/Paths
+  paths-kebab-case: true
+  no-http-verbs-in-path: true
+  no-ambiguous-paths: true
+  operation-4xx-response: true
+  path-declarations-must-exist: true
+  path-keys-no-trailing-slash: true
+  path-not-include-query: true
+  operation-operationId-valid-in-url: true
+  operation-success-response: true
+  operation-operationId: true
+  operation-operationId-unique: true
+  operation-parameters: true
+  path-params: true
+
+  # Schemas
+  duplicated-entry-in-enum: true
+  no-$ref-siblings: true
+  oas3-schema: true
+  oas3-unused-component: true
+  typed-enum: true
+
+  # Spec Information
+  oas3-host-trailing-slash: true
+  info-description: true
+  license-url: true
+
+  # Validation
+  oas3-api-servers: true
+  no-eval-in-markdown: true
+  no-script-tags-in-markdown: true
+
+  # Descriptions
+  component-description: true
+  description-duplication: true
+  oas3-parameter-description: true
+  operation-description: true
+
+  # Tags
+  tag-description: true
+  operation-tags: true
+  openapi-tags: true
+  openapi-tags-alphabetical: true
+  operation-singular-tag: true
+  operation-tag-defined: true
+
+  # Security
+  oas3-operation-security-defined: true
+
+
+
