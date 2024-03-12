@@ -7,7 +7,7 @@ GOLANGCI_LINT_VERSION=v1.56.2
 all: clean api build
 
 run:
-	godotenv -f .env go run cmd/main.go
+	godotenv -f .env go run cmd/users-api-server/main.go
 
 .PHONY: build
 build:
@@ -15,7 +15,7 @@ build:
 
 .PHONY: api
 api:
-	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \
+	oapi-codegen --config=./api/openapi-specs/configs/server.yaml \P
 		api/openapi-specs/openapi.yaml > internal/platform/server/api_server.gen.go
 
 lint:
@@ -39,7 +39,7 @@ install-tools:
 	# code generation
 	go install github.com/vektra/mockery/v2@v2.42.0
 	go install github.com/daveshanley/vacuum@v0.9.10
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v2.1.0
+	go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@v2.1.0
 	# lint tools
 	go install golang.org/x/tools/cmd/goimports@latest
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ${GOPATH}/bin ${GOLANGCI_LINT_VERSION}
