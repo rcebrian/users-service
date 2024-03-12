@@ -2,9 +2,12 @@ SHELL = /bin/bash
 MAKEFLAGS += --silent
 
 COVERAGE_DIR=coverage
-GOLANGCI_LINT_VERSION=v1.55.2
+GOLANGCI_LINT_VERSION=v1.56.2
 
 all: clean api build
+
+run:
+	godotenv -f .env go run cmd/main.go
 
 .PHONY: build
 build:
@@ -31,10 +34,12 @@ coverage: test
 	go tool cover -func=${COVERAGE_DIR}/coverage.out > ${COVERAGE_DIR}/coverage.txt
 
 install-tools:
+	# run
+	go install github.com/joho/godotenv/cmd/godotenv@latest
 	# code generation
-	go install github.com/vektra/mockery/v2@v2.33.2
-	go install github.com/daveshanley/vacuum@v0.3.13
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.15.0
+	go install github.com/vektra/mockery/v2@v2.42.0
+	go install github.com/daveshanley/vacuum@v0.9.10
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v2.1.0
 	# lint tools
 	go install golang.org/x/tools/cmd/goimports@latest
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ${GOPATH}/bin ${GOLANGCI_LINT_VERSION}
